@@ -33,12 +33,12 @@ public class SearchOpportunitiesExample {
 
     SearchOpportunitiesExample(Context context) {
         mContext = context;
-        searchOpps(null, 10);
+        searchOpps(updatedSince, 10);
     }
 
     private void searchOpps(String updatedSince, int maxDisplay) {
         VolunteerMatchApiService service = new VolunteerMatchApiService();
-        service.setApiUrl(url); // this call is really only needed if you want use the stage server
+//        service.setApiUrl(url); // this call is really only needed if you want use the stage server
         service.setContext(mContext);
         int pageNumber = 0;
 
@@ -56,7 +56,7 @@ public class SearchOpportunitiesExample {
         OppSearchQuery.DateRange dr = new OppSearchQuery.DateRange();
         dr.setSingleDayOpps(true);
         dr.setStartDate("2017-02-01");
-        dr.setEndDate("2017-2-6");
+        dr.setEndDate("2017-02-06");
         if(updatedSince != null && updatedSince.length() > 0) {
             oq.setUpdatedSince(updatedSince);
             //oq.setIncludeInactive(true);
@@ -99,15 +99,11 @@ public class SearchOpportunitiesExample {
         return reportResult;
     }
 
-    public Context getContext() {
-        return mContext;
-    }
-
     public void setContext(Context mContext) {
         this.mContext = mContext;
     }
 
-//    static private void printUsage() {
+    //    static private void printUsage() {
 //        System.out.println("Valid command line arguments:" );
 //        System.out.println("\nurl=http://www.stage.volunteermatch.org/api/call - This is the default and can be replaced with\n" +
 //                "                                                   an alternate url of a test server." );

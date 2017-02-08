@@ -15,7 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.util.Collections;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         //Create dataset
 //        Calendar calendar = Calendar.getInstance();
 //        calendar.add(Calendar.DAY_OF_WEEK, -10);
-        mAdapter = new SearchResultAdapter(Collections.<OppSearchResult.Opportunities>emptyList());
+        mAdapter = new SearchResultAdapter(new ArrayList<OppSearchResult.Opportunities>());
         mRecyclerView.setAdapter(mAdapter);
         new SearchOpportunitiesExample(this);
     }

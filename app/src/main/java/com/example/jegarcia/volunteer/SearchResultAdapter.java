@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Provide a reference to the views for each data item
@@ -48,10 +49,10 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     // - replace the contents of the view with that element
     @Override
     public void onBindViewHolder(OpportunitiesViewHolder holder, int position) {
-        holder.id.setText(mDataset.get(position).getId());
-        holder.title.setText(mDataset.get(position).getId());
-        holder.updated.setText(mDataset.get(position).getId());
-        holder.status.setText(mDataset.get(position).getId());
+        holder.id.setText(String.valueOf(mDataset.get(position).getId()));
+        holder.title.setText(mDataset.get(position).getTitle());
+        holder.updated.setText(mDataset.get(position).getUpdated());
+        holder.status.setText(mDataset.get(position).getStatus());
     }
 
     @Override
@@ -60,6 +61,9 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     }
 
     public void addItems(List<OppSearchResult.Opportunities> opportunities) {
+        if (mDataset == null) {
+            mDataset = new ArrayList<>();
+        }
         mDataset.addAll(opportunities);
         notifyDataSetChanged();
     }
