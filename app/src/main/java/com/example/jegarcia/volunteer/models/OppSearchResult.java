@@ -1,4 +1,6 @@
-package com.example.jegarcia.volunteer;
+package com.example.jegarcia.volunteer.models;
+
+import com.orm.SugarRecord;
 
 import java.util.ArrayList;
 
@@ -11,7 +13,7 @@ import java.util.ArrayList;
  *
  * Created by jrackwitz on 12/3/15.
  */
-public class OppSearchResult {
+public class OppSearchResult extends SugarRecord {
     private Integer currentPage;
     private ArrayList<Opportunities> opportunities;
     private Integer resultsSize;
@@ -52,45 +54,4 @@ public class OppSearchResult {
 
     public OppSearchResult() {
     }
-
-    public class Opportunities {
-        private Integer id;
-        private String title;
-        private String updated;
-        private String status;
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-
-        public String getUpdated() {
-            return updated;
-        }
-
-        public void setUpdated(String updated) {
-            this.updated = updated;
-        }
-
-        public Integer getId() {
-            return id;
-        }
-
-        public void setId(Integer id) {
-            this.id = id;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-    }
-
 }

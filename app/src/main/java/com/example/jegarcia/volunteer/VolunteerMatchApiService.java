@@ -1,9 +1,11 @@
 package com.example.jegarcia.volunteer;
 
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.example.jegarcia.volunteer.models.OppSearchResult;
+import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
 
 import org.apache.axis.encoding.Base64;
 
@@ -28,16 +30,19 @@ import java.util.Date;
 public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
 
     private WSSECredentials wsse = null;
-    private String accountName;
     private static final DateFormat DATETIME_FORMAT =  new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     private static final String CHARSET = "UTF-8";
     private static String apiUrl = "http://www.volunteermatch.org/api/call";
 
-    public static final String HTTP_METHOD_GET = "GET";
-    public static final String TAG = VolunteerMatchApiService.class.getName();
-    private Context mContext;
+    private static String accountName = "garciaj42";
+    private static String password = "0ed901afd6584a580e3aaf55484dec04";
 
-    public VolunteerMatchApiService() {
+    public static final String HTTP_METHOD_GET = "GET";
+    private static final String TAG = VolunteerMatchApiService.class.getName();
+    private SearchResultAdapter adapter;
+
+    public VolunteerMatchApiService(SearchResultAdapter adapter) {
+        this.adapter = adapter;
     }
 
     // SEARCH_OPPORTUNITIES, searchOppsQuery, "GET", user, key
@@ -46,12 +51,9 @@ public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
         String apiMethod = strings[0];
         String query = strings[1];
         String httpMethod = strings[2];
-        String accountName = strings[3];
-        String password = strings[4];
 
         HttpURLConnection urlConnection = null;
         try {
-            this.accountName = accountName;
             wsse = buildWSSECredentials(accountName, password);
         } catch (Exception e) {
             try {
@@ -66,10 +68,10 @@ public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String s) {
-        MainActivity mainActivity = (MainActivity) mContext;
-        SearchResultAdapter searchResultAdapter = (SearchResultAdapter) mainActivity.getAdapter();
+//        MainActivity mainActivity = (MainActivity) mContext; //TODO specific recyclerView
+//        SearchResultAdapter searchResultAdapter = (SearchResultAdapter) recyclerView.getAdapter();
         OppSearchResult result = SearchOpportunitiesExample.parseResult(s);
-        searchResultAdapter.addItems(result.getOpportunities());
+        adapter.addItems(result.getOpportunities());
         super.onPostExecute(s);
     }
 
@@ -242,14 +244,6 @@ public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
         apiUrl = url;
     }
 
-    public Context getContext() {
-        return mContext;
-    }
-
-    public void setContext(Context mContext) {
-        this.mContext = mContext;
-    }
-
     /**
      * Structure representing a set of WSSE credentials.
      */
@@ -260,29 +254,3 @@ public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
         public String timestamp= "";
     }
 }
-
-//    /** Call the VolunteerMatch API for the specified method (
-//     *
-//     * @param apiMethod
-//     * @param query
-//     * @param httpMethod
-//     * @param accountName
-//     * @param password
-//     * @return
-//     */
-//    public String callAPI(String apiMethod, String query, String httpMethod, String accountName, String password) {
-//        HttpURLConnection urlConnection = null;
-//        try {
-//            this.accountName = accountName;
-//            wsse = buildWSSECredentials(accountName, password);
-//        } catch (Exception e) {
-//            try {
-//                return "Code " + urlConnection.getResponseCode() + " : " + urlConnection.getResponseMessage();
-//            } catch (Exception e2) {
-////                log.error("An unknown error occurred while processing an API call for method " + apiMethod + ", query " + query, e2);
-//                return null;
-//            }
-//        }
-//        return callAPI(apiUrl, apiMethod, query, httpMethod);
-//    }
-

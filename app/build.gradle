@@ -26,4 +26,10 @@ dependencies {
     compile 'com.android.support:design:24.2.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'org.apache.axis:axis:1.4'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
+    compile 'com.google.android.gms:play-services:10.2.1'
+    compile 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile 'com.github.satyan:sugar:1.4'
 }

@@ -21,7 +21,25 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <FrameLayout
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/content_frame">
+
+    </FrameLayout>
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/recyclerViewHolder"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical">-->
+
+    <!--<include android:id="@+id/recyclerView0" layout="@layout/content_main" />-->
+    <!--<include android:id="@+id/recyclerView1" layout="@layout/content_main" />-->
+    <!--<include android:id="@+id/recyclerView2" layout="@layout/content_main" />-->
+
+    <!--</LinearLayout>-->
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

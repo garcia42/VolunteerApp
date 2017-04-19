@@ -1,28 +1,34 @@
 package com.example.jegarcia.volunteer;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 
-import java.util.ArrayList;
+import com.example.jegarcia.volunteer.fragments.TaskFragment;
+import com.example.jegarcia.volunteer.fragments.VolunteerList;
+import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
+
+import butterknife.BindView;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, TaskFragment.TaskCallbacks {
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    VolunteerList volunteerListFragment;
+
+    @BindView(R.id.content_frame)
+    FrameLayout frameLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,30 +55,17 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //RecyclerView
-        mRecyclerView = (RecyclerView) findViewById(R.id.opportunitiesView);
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        //Create dataset
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.add(Calendar.DAY_OF_WEEK, -10);
-        mAdapter = new SearchResultAdapter(new ArrayList<OppSearchResult.Opportunities>());
-        mRecyclerView.setAdapter(mAdapter);
-        new SearchOpportunitiesExample(this);
+        if (savedInstanceState == null) {
+            volunteerListFragment = new VolunteerList();
+            volunteerListFragment.setArguments(getIntent().getExtras());
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(R.id.content_frame, volunteerListFragment).commit();
+        }
     }
 
-    public RecyclerView.Adapter getAdapter() {
-        return mAdapter;
-    }
+    public SearchResultAdapter getAdapter() {
 
-    public void setAdapter(RecyclerView.Adapter mAdapter) {
-        this.mAdapter = mAdapter;
+        return volunteerListFragment.getAdapter();
     }
 
     @Override
@@ -130,5 +123,47 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public static boolean isEmulator() {
+        return Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || "google_sdk".equals(Build.PRODUCT);
+    }
+
+    @Override
+    public void onPreExecute() {
+
+    }
+
+    @Override
+    public void onProgressUpdate(int percent) {
+
+    }
+
+    @Override
+    public void onCancelled() {
+
+    }
+
+    @Override
+    public void onPostExecute() {
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 }
