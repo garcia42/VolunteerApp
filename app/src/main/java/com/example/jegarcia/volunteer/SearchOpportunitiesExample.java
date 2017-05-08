@@ -4,6 +4,7 @@ import com.example.jegarcia.volunteer.models.OppSearchQuery;
 import com.example.jegarcia.volunteer.models.OppSearchResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.orm.SugarRecord;
 
 import java.util.ArrayList;
 
@@ -28,6 +29,8 @@ public class SearchOpportunitiesExample {
 //    private static String updatedSince = "2015-04-05T00:00:00Z";
 
     public static final String TAG = VolunteerMatchApiService.class.getName();
+    private static final SugarExclusionStrategy strategy = new SugarExclusionStrategy(SugarRecord.class);
+
 
     private SearchOpportunitiesExample() {
     }
@@ -78,7 +81,12 @@ public class SearchOpportunitiesExample {
             String resultArray[] = result.split("\n");
             if (resultArray.length == 2) {
                 try {
-                    Gson gson = new GsonBuilder().serializeNulls().disableHtmlEscaping().create();
+                    Gson gson = new GsonBuilder()
+                            .serializeNulls()
+                            .disableHtmlEscaping()
+                            .addDeserializationExclusionStrategy(strategy)
+                            .addSerializationExclusionStrategy(strategy)
+                            .create();
                     reportResult = gson.fromJson(resultArray[1], OppSearchResult.class);
                 } catch (Exception jbe) {
                     System.out.println("Error decoding json result: " + jbe);

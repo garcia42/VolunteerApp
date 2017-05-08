@@ -14,7 +14,7 @@ public class VolunteerRequestUtils {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private static final SimpleDateFormat dateAndTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    public static final int daysSince = 2;
+    public static final int daysSince = 15;
 
     private VolunteerRequestUtils() {
         //Private Constructor so it can't be created

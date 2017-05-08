@@ -16,8 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.example.jegarcia.volunteer.fragments.RecyclerViewFragment;
 import com.example.jegarcia.volunteer.fragments.TaskFragment;
-import com.example.jegarcia.volunteer.fragments.VolunteerList;
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
 
 import butterknife.BindView;
@@ -25,7 +25,7 @@ import butterknife.BindView;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TaskFragment.TaskCallbacks {
 
-    VolunteerList volunteerListFragment;
+    RecyclerViewFragment volunteerListFragment;
 
     @BindView(R.id.content_frame)
     FrameLayout frameLayout;
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
-            volunteerListFragment = new VolunteerList();
+            volunteerListFragment = new RecyclerViewFragment();
             volunteerListFragment.setArguments(getIntent().getExtras());
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(R.id.content_frame, volunteerListFragment).commit();
@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     public SearchResultAdapter getAdapter() {
-
         return volunteerListFragment.getAdapter();
     }
 

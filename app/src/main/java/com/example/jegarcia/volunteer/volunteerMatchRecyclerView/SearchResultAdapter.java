@@ -90,6 +90,12 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
             mDataset = new ArrayList<>();
         }
         mDataset.addAll(opportunities);
+        for (Opportunities opportunity: opportunities) {
+            opportunity.save();
+        }
+        for (Opportunities opportunity: opportunities) {
+            opportunity.delete();
+        }
         notifyDataSetChanged();
     }
 }

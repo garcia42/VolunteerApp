@@ -1,15 +1,11 @@
 package com.example.jegarcia.volunteer.models;
 
 import com.google.gson.annotations.SerializedName;
-import com.orm.dsl.Table;
+import com.orm.SugarRecord;
 
-@Table
-public class Organization {
+public class Organization extends SugarRecord {
 
     private int avgRating;
-
-    @SerializedName("db_id")
-    private transient Long id = null;
 
     @SerializedName("id")
     private Integer orgId;

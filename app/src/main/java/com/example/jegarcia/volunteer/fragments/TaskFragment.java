@@ -14,21 +14,9 @@ import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAda
  */
 public class TaskFragment extends Fragment {
 
-    public static TaskFragment newInstance(int recyclerView,
-                                           String httpMethod,
-                                           String searchQuery,
-                                           String restMethod) {
-        TaskFragment myFragment = new TaskFragment();
-
-        Bundle args = new Bundle();
-        args.putInt("recyclerView_index", recyclerView);
-        args.putString("httpMethod", httpMethod);
-        args.putString("query", searchQuery);
-        args.putString("restMethod", restMethod);
-        myFragment.setArguments(args);
-
-        return myFragment;
-    }
+    private String httpMethod;
+    private String searchQuery;
+    private String restMethod;
 
     /**
      * Callback interface through which the fragment will report the
@@ -67,21 +55,36 @@ public class TaskFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Retain this fragment across configuration changes.
+        setRetainInstance(true);
+        start();
+    }
 
-//        int index = getArguments().getInt("recyclerView_index", 0);
-        String httpMethod = getArguments().getString("httpMethod", "GET");
-        String query = getArguments().getString("query", "");
-        String restMethod = getArguments().getString("restMethod", "searchOpportunities");
+    public void updateData(int recyclerView,
+                           String httpMethod,
+                           String searchQuery,
+                           String restMethod,
+                           boolean start) {
+
+        this.httpMethod = httpMethod;
+        this.searchQuery = searchQuery;
+        this.restMethod = restMethod;
+        if (start) {
+            start();
+        }
+    }
+
+    public void start() {
+//        String httpMethod = getArguments().getString("httpMethod", "GET");
+//        String searchQuery = getArguments().getString("query", "");
+//        String restMethod = getArguments().getString("restMethod", "searchOpportunities");
 
         MainActivity mainActivity = (MainActivity) getContext();
         SearchResultAdapter adapter = mainActivity.getAdapter();
 
-        // Retain this fragment across configuration changes.
-        setRetainInstance(true);
-
-        // Create and execute the background task.
         mTask = new VolunteerMatchApiService(adapter);
-        mTask.execute(restMethod, query, httpMethod);
+        mTask.execute(restMethod, searchQuery, httpMethod);
+
     }
 
     /**

@@ -28,6 +28,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:name="com.orm.SugarApp"
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
@@ -47,6 +48,10 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAG0Sz_IDTvn4uav6T0iPjltuF_pVQfenc" />
+
+        <meta-data android:name="QUERY_LOG" android:value="true" />
+        <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.example.jegarcia.volunteer.models" />
+        <meta-data android:name="VERSION" android:value="3" />
 
     </application>
 

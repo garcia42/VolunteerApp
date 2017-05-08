@@ -240,6 +240,10 @@ public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
         return null;
     }
 
+    public void setAdapter(SearchResultAdapter adapter) {
+        this.adapter = adapter;
+    }
+
     public void setApiUrl(String url) {
         apiUrl = url;
     }
