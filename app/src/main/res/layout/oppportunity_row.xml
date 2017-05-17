@@ -5,7 +5,7 @@
 
     <TextView
         android:id="@+id/idView"
-        android:text="123456"
+        android:text="Id of Organization"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
