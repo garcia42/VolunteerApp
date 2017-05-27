@@ -1,15 +1,27 @@
-package com.example.jegarcia.volunteer.models;
+package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
-import com.orm.SugarRecord;
+import com.example.jegarcia.volunteer.models.BaseObjectModel;
 
-public class Availability extends SugarRecord {
+import java.io.Serializable;
 
-    private String endDate;
-    private String endTime;
-    private String ongoing;
-    private String singleDayOpportunity;
-    private String startDate;
-    private String startTime;
+import io.requery.Entity;
+import io.requery.Generated;
+import io.requery.Key;
+import io.requery.Persistable;
+
+@Entity
+public abstract class Availability extends BaseObjectModel implements Serializable, Persistable {
+
+    @Key
+    @Generated
+    int id;
+
+    String endDate;
+    String endTime;
+    String ongoing;
+    String singleDayOpportunity;
+    String startDate;
+    String startTime;
 
     public String getEndDate() {
         return endDate;

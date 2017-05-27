@@ -1,35 +1,64 @@
-package com.example.jegarcia.volunteer.models;
+package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
+import com.example.jegarcia.volunteer.models.BaseObjectModel;
+import com.example.jegarcia.volunteer.models.converters.StringArrayConverter;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 
-public class Opportunities extends SugarRecord {
+import java.io.Serializable;
+
+import io.requery.Convert;
+import io.requery.Entity;
+import io.requery.Generated;
+import io.requery.Key;
+import io.requery.ManyToOne;
+import io.requery.OneToOne;
+import io.requery.Persistable;
+
+@Entity
+public abstract class Opportunities extends BaseObjectModel implements Serializable, Persistable {
+
+    @Key
+    @Generated
+    int id;
 
     @SerializedName("id")
-    private Integer oppId;
+    Integer oppId;
 
-    private String title;
-    private String updated;
-    private String status;
-    private Availability availability;
-    private String imageUrl;
-    private String contact;
-    private String volunteersNeeded;
+    String title;
+    String updated;
+    String status;
 
-    private String skillsNeeded;
-    private String[] greatFor;
+    @OneToOne
+    AvailabilityEntity availability;
+    String imageUrl;
+    String contact;
+    String volunteersNeeded;
 
-    private String[] descriptions;
+    String skillsNeeded;
 
-    private Integer minimumAge;
-    private Integer numReferred;
-    private Integer spacesAvailable;
+    @Convert(StringArrayConverter.class)
+    String[] greatFor;
 
-    private Organization parentOrg;
-    private Location location;
+    @Convert(StringArrayConverter.class)
+    String[] descriptions;
 
-    private boolean virtual;
-    private boolean requiresAddress;
+    Integer minimumAge;
+    Integer numReferred;
+    Integer spacesAvailable;
+
+    @ManyToOne
+    Organization parentOrg;
+
+    @ManyToOne
+    Location location;
+
+    boolean virtual;
+    boolean requiresAddress;
+    boolean hasWaitlist;
+
+    // Fields needed for db
+    Integer orgId;
+    Integer locationId;
 
     public boolean isHasWaitlist() {
         return hasWaitlist;
@@ -59,15 +88,15 @@ public class Opportunities extends SugarRecord {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(LocationEntity location) {
         this.location = location;
     }
 
-    public Organization getParentOrg() {
+    public OrganizationEntity getParentOrg() {
         return parentOrg;
     }
 
-    public void setParentOrg(Organization parentOrg) {
+    public void setParentOrg(OrganizationEntity parentOrg) {
         this.parentOrg = parentOrg;
     }
 
@@ -147,11 +176,9 @@ public class Opportunities extends SugarRecord {
         return availability;
     }
 
-    public void setAvailability(Availability availability) {
+    public void setAvailability(AvailabilityEntity availability) {
         this.availability = availability;
     }
-
-    private boolean hasWaitlist;
 
     public String getStatus() {
         return status;

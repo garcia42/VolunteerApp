@@ -4,7 +4,7 @@ package com.example.jegarcia.volunteer;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.jegarcia.volunteer.models.OppSearchResult;
+import com.example.jegarcia.volunteer.models.restModels.OppSearchResult;
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
 
 import org.apache.axis.encoding.Base64;

@@ -1,18 +1,32 @@
-package com.example.jegarcia.volunteer.models;
+package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
-import com.orm.SugarRecord;
+import com.example.jegarcia.volunteer.models.BaseObjectModel;
 
-class Contact extends SugarRecord {
+import java.io.Serializable;
 
-    private String created;
-    private String email;
-    private String firstName;
-    private String lastName;
-    private String phone;
-    private String updated;
+import io.requery.Entity;
+import io.requery.Generated;
+import io.requery.Key;
+import io.requery.ManyToOne;
+import io.requery.Persistable;
 
-    private Location location;
-    //        private MemberFields[] memberFields;
+@Entity
+abstract class Contact extends BaseObjectModel implements Serializable, Persistable {
+
+    @Key
+    @Generated
+    int id;
+
+    String created;
+    String email;
+    String firstName;
+    String lastName;
+    String phone;
+    String updated;
+
+    @ManyToOne
+    Location location;
+    //        MemberFields[] memberFields;
 
     public Location getLocation() {
         return location;

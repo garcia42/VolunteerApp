@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,8 +31,9 @@ import android.widget.Button;
 import com.example.jegarcia.volunteer.R;
 import com.example.jegarcia.volunteer.SearchOpportunitiesExample;
 import com.example.jegarcia.volunteer.VolunteerMatchApiService;
-import com.example.jegarcia.volunteer.models.Opportunities;
+import com.example.jegarcia.volunteer.models.OpportunitiesEntity;
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.EndlessRecyclerViewScrollListener;
+import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.RecyclerViewClickListener;
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
 
 import java.util.ArrayList;
@@ -43,7 +45,7 @@ import static com.example.jegarcia.volunteer.VolunteerRequestUtils.formatDateAnd
  * Demonstrates the use of {@link RecyclerView} with a {@link LinearLayoutManager} and a
  * {@link GridLayoutManager}.
  */
-public class RecyclerViewFragment extends Fragment {
+public class RecyclerViewFragment extends Fragment implements RecyclerViewClickListener {
 
     private static final String TAG = "RecyclerViewFragment";
     private static final String KEY_LAYOUT_MANAGER = "layoutManager";
@@ -62,12 +64,21 @@ public class RecyclerViewFragment extends Fragment {
     private TaskFragment mTaskFragment;
 
     @Override
+    public void recyclerViewListClicked(View v, int position) {
+        if (mAdapter != null) {
+            AppCompatActivity activity = (AppCompatActivity) v.getContext();
+            OpportunityFragment organizationFragment = new OpportunityFragment();
+            Bundle b = new Bundle();
+            OpportunitiesEntity opportunities = mAdapter.getItemAtPosition(position);
+            b.putInt("opportunity_id", opportunities.getId());
+            organizationFragment.setArguments(b);
+            activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, organizationFragment).addToBackStack(null).commit();
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Initialize dataset, this data would usually come from a local content provider or
-        // remote server.
-//        initDataset();
     }
 
     @Override
@@ -93,7 +104,7 @@ public class RecyclerViewFragment extends Fragment {
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
 
-        mAdapter = new SearchResultAdapter(new ArrayList<Opportunities>(), getActivity());
+        mAdapter = new SearchResultAdapter(new ArrayList<OpportunitiesEntity>(), getActivity(), this);
         mRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {

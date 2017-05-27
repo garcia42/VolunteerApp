@@ -1,10 +1,10 @@
 package com.example.jegarcia.volunteer;
 
-import com.example.jegarcia.volunteer.models.OppSearchQuery;
-import com.example.jegarcia.volunteer.models.OppSearchResult;
+import com.example.jegarcia.volunteer.models.BaseObjectModel;
+import com.example.jegarcia.volunteer.models.restModels.OppSearchQuery;
+import com.example.jegarcia.volunteer.models.restModels.OppSearchResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.orm.SugarRecord;
 
 import java.util.ArrayList;
 
@@ -29,7 +29,7 @@ public class SearchOpportunitiesExample {
 //    private static String updatedSince = "2015-04-05T00:00:00Z";
 
     public static final String TAG = VolunteerMatchApiService.class.getName();
-    private static final SugarExclusionStrategy strategy = new SugarExclusionStrategy(SugarRecord.class);
+    private static final SugarExclusionStrategy strategy = new SugarExclusionStrategy(BaseObjectModel.class);
 
 
     private SearchOpportunitiesExample() {

@@ -1,6 +1,7 @@
-package com.example.jegarcia.volunteer.models;
+package com.example.jegarcia.volunteer.models.restModels;
 
-import com.orm.SugarRecord;
+import com.example.jegarcia.volunteer.models.BaseObjectModel;
+import com.example.jegarcia.volunteer.models.OpportunitiesEntity;
 
 import java.util.ArrayList;
 
@@ -13,9 +14,9 @@ import java.util.ArrayList;
  *
  * Created by jrackwitz on 12/3/15.
  */
-public class OppSearchResult extends SugarRecord {
+public class OppSearchResult extends BaseObjectModel {
     private Integer currentPage;
-    private ArrayList<Opportunities> opportunities;
+    private ArrayList<OpportunitiesEntity> opportunities;
     private Integer resultsSize;
     private String sortCriteria;
 
@@ -27,11 +28,11 @@ public class OppSearchResult extends SugarRecord {
         this.currentPage = currentPage;
     }
 
-    public ArrayList<Opportunities> getOpportunities() {
+    public ArrayList<OpportunitiesEntity> getOpportunities() {
         return opportunities;
     }
 
-    public void setOpportunities(ArrayList<Opportunities> opportunities) {
+    public void setOpportunities(ArrayList<OpportunitiesEntity> opportunities) {
         this.opportunities = opportunities;
     }
 

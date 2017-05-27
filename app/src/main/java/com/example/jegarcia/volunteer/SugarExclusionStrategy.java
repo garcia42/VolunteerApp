@@ -17,6 +17,6 @@ public class SugarExclusionStrategy implements ExclusionStrategy {
 
     @Override
     public boolean shouldSkipField(FieldAttributes f) {
-        return f.getDeclaringClass().equals(clazz) && f.getName().equals("id");
+        return f.getDeclaringClass().getSuperclass().equals(clazz) && f.getName().toLowerCase().equals("id");
     }
 }

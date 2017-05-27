@@ -1,7 +1,6 @@
 package com.example.jegarcia.volunteer.volunteerMatchRecyclerView;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.jegarcia.volunteer.MainActivity;
 import com.example.jegarcia.volunteer.R;
-import com.example.jegarcia.volunteer.fragments.OpportunityFragment;
-import com.example.jegarcia.volunteer.models.Opportunities;
+import com.example.jegarcia.volunteer.models.OpportunitiesEntity;
 import com.squareup.picasso.Picasso;
 
 import org.apache.axis.utils.StringUtils;
@@ -19,6 +18,9 @@ import org.apache.axis.utils.StringUtils;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.requery.Persistable;
+import io.requery.reactivex.ReactiveEntityStore;
 
 import static com.example.jegarcia.volunteer.R.id.imageView;
 
@@ -28,12 +30,16 @@ import static com.example.jegarcia.volunteer.R.id.imageView;
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.OpportunitiesViewHolder> {
 
     private final Context mContext;
-    private List<Opportunities> mDataset;
+    private List<OpportunitiesEntity> mDataset;
     private int daysSince;
+    public RecyclerViewClickListener mListener;
 
     public int getdaysSince() {
         return daysSince;
     }
+
+    private final ReactiveEntityStore<Persistable> data;
+
 
     public static class OpportunitiesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView id;
@@ -41,10 +47,9 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         private TextView updated;
         private TextView status;
         private ImageView image;
+        public RecyclerViewClickListener mListener;
 
-        public OpportunitiesClickListener mListener;
-
-        public OpportunitiesViewHolder(View itemView, OpportunitiesClickListener listener) {
+        public OpportunitiesViewHolder(View itemView, RecyclerViewClickListener listener) {
             super(itemView);
             mListener = listener;
             this.id = (TextView) itemView.findViewById(R.id.idView);
@@ -52,26 +57,20 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
             this.updated = (TextView) itemView.findViewById(R.id.updatedView);
             this.status = (TextView) itemView.findViewById(R.id.statusView);
             this.image = (ImageView) itemView.findViewById(imageView);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            mListener.onClickHolder(v);
-        }
-
-        public interface OpportunitiesClickListener {
-            void onClickHolder(View caller);
+            mListener.recyclerViewListClicked(v, this.getLayoutPosition());
         }
     }
 
-    public class OpportunitiesClickListener {
-        public void onClickHolder(View v) {
-        };
-    }
-
-    public SearchResultAdapter(List<Opportunities> myDataset, Context context) {
+    public SearchResultAdapter(List<OpportunitiesEntity> myDataset, Context context, RecyclerViewClickListener listener) {
         mDataset = myDataset;
         mContext = context;
+        mListener = listener;
+        data = ((MainActivity) context).getData();
     }
 
     // Create new views (invoked by the layout manager) all views from viewholder
@@ -80,16 +79,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         View viewHolderLayout = (View) LayoutInflater.from(parent.getContext()).inflate(R.layout.oppportunity_row, parent, false);
         //set view's size, margins, padding here, layout params
 
-        OpportunitiesViewHolder viewHolder = new OpportunitiesViewHolder(viewHolderLayout, new OpportunitiesViewHolder.OpportunitiesClickListener() {
-            @Override
-            public void onClickHolder(View v) {
-                //You can change the fragment, something like this, not tested, please correct for your desired output:
-                AppCompatActivity activity = (AppCompatActivity) v.getContext();
-                OpportunityFragment organizationFragment = new OpportunityFragment();
-                //Create a bundle to pass data, add data, set the bundle to your fragment and:
-                activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, organizationFragment).addToBackStack(null).commit();
-            }
-        });
+        OpportunitiesViewHolder viewHolder = new OpportunitiesViewHolder(viewHolderLayout, mListener);
 
         return viewHolder;
     }
@@ -114,17 +104,21 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         return mDataset.size();
     }
 
-    public void addItems(List<Opportunities> opportunities) {
+    public void addItems(List<OpportunitiesEntity> opportunities) {
         if (mDataset == null) {
             mDataset = new ArrayList<>();
         }
         mDataset.addAll(opportunities);
-        for (Opportunities opportunity: opportunities) {
-            opportunity.save();
-        }
-        for (Opportunities opportunity: opportunities) {
-            opportunity.delete();
+        for (OpportunitiesEntity opportunity: opportunities) {
+            data.insert(opportunity).toObservable();
         }
         notifyDataSetChanged();
+    }
+
+    public OpportunitiesEntity getItemAtPosition(int position) {
+        if (mDataset != null && mDataset.size() >= position - 1) {
+            return mDataset.get(position);
+        }
+        return null;
     }
 }

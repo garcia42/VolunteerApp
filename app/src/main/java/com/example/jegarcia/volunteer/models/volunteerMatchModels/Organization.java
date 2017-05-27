@@ -1,31 +1,51 @@
-package com.example.jegarcia.volunteer.models;
+package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
+import com.example.jegarcia.volunteer.models.BaseObjectModel;
+import com.example.jegarcia.volunteer.models.converters.IntegerArrayConverter;
 import com.google.gson.annotations.SerializedName;
-import com.orm.SugarRecord;
 
-public class Organization extends SugarRecord {
+import java.io.Serializable;
 
-    private int avgRating;
+import io.requery.Convert;
+import io.requery.Entity;
+import io.requery.Generated;
+import io.requery.Key;
+import io.requery.ManyToOne;
+import io.requery.Persistable;
+
+@Entity
+public abstract class Organization extends BaseObjectModel implements Serializable, Persistable {
+
+    @Key
+    @Generated
+    int id;
+
+    int avgRating;
 
     @SerializedName("id")
-    private Integer orgId;
+    Integer orgId;
 
-    private int[] categoryIds;
+    @Convert(IntegerArrayConverter.class)
+    int[] categoryIds;
 
-    private String created;
-    private String description;
-    private String imageUrl;
-    private String mission;
-    private String name;
-    private String numReviews;
-    private String plaintextDescription;
-    private String plaintextMission;
-    private String updated;
-    private String type;
-    private String vmUrl;
-    private String url;
+    String created;
+    String description;
+    String imageUrl;
+    String mission;
+    String name;
+    String numReviews;
+    String plaintextDescription;
+    String plaintextMission;
+    String updated;
+    String type;
+    String vmUrl;
+    String url;
 
-    private Contact contact;
+    @ManyToOne
+    Contact contact;
+
+    @ManyToOne
+    Location location;
 
     public Location getLocation() {
         return location;
@@ -162,7 +182,4 @@ public class Organization extends SugarRecord {
     public void setAvgRating(int avgRating) {
         this.avgRating = avgRating;
     }
-
-    private Location location;
-
 }

@@ -1,6 +1,6 @@
-package com.example.jegarcia.volunteer.models;
+package com.example.jegarcia.volunteer.models.restModels;
 
-import com.orm.SugarRecord;
+import com.example.jegarcia.volunteer.models.BaseObjectModel;
 
 import java.util.ArrayList;
 
@@ -13,7 +13,7 @@ import java.util.ArrayList;
  *
  * Created by jrackwitz on 12/3/15.
  */
-public class OppSearchQuery extends SugarRecord {
+public class OppSearchQuery extends BaseObjectModel {
     private String location;
     private boolean virtual;
     private String radius;
@@ -22,6 +22,8 @@ public class OppSearchQuery extends SugarRecord {
     private String sortCriteria;
     private String updatedSince;
     private boolean includeInactive;
+    private Integer pageNumber = 1;
+    private ArrayList<String> fieldsToDisplay;
 
     public boolean isIncludeInactive() {
         return includeInactive;
@@ -103,10 +105,8 @@ public class OppSearchQuery extends SugarRecord {
         this.fieldsToDisplay = fieldsToDisplay;
     }
 
-    Integer pageNumber = 1;
-    ArrayList<String> fieldsToDisplay;
+    public static class DateRange {
 
-    public static class DateRange extends SugarRecord {
         private Boolean singleDayOpps;
         private String startDate;
         private String endDate;

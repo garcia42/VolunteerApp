@@ -1,17 +1,32 @@
-package com.example.jegarcia.volunteer.models;
+package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
-import com.orm.SugarRecord;
+import com.example.jegarcia.volunteer.models.BaseObjectModel;
 
-public class Location extends SugarRecord {
+import java.io.Serializable;
 
-    private String city;
-    private String country;
-    private GeoLocation geoLocation;
-    private String postalCode;
-    private String region;
-    private String street1;
-    private String street2;
-    private String street3;
+import io.requery.Entity;
+import io.requery.Generated;
+import io.requery.Key;
+import io.requery.OneToOne;
+import io.requery.Persistable;
+
+@Entity
+public abstract class Location extends BaseObjectModel implements Serializable, Persistable {
+
+    @Key
+    @Generated
+    int id;
+
+    String city;
+    String country;
+    String postalCode;
+    String region;
+    String street1;
+    String street2;
+    String street3;
+
+    @OneToOne
+    GeoLocation geoLocation;
 
     public String getCountry() {
         return country;
@@ -75,35 +90,5 @@ public class Location extends SugarRecord {
 
     public void setStreet3(String street3) {
         this.street3 = street3;
-    }
-
-    private class GeoLocation extends SugarRecord {
-        private String accuracy;
-        private long latitude;
-        private long longitude;
-
-        public String getAccuracy() {
-            return accuracy;
-        }
-
-        public void setAccuracy(String accuracy) {
-            this.accuracy = accuracy;
-        }
-
-        public long getLatitude() {
-            return latitude;
-        }
-
-        public void setLatitude(long latitude) {
-            this.latitude = latitude;
-        }
-
-        public long getLongitude() {
-            return longitude;
-        }
-
-        public void setLongitude(long longitude) {
-            this.longitude = longitude;
-        }
     }
 }
