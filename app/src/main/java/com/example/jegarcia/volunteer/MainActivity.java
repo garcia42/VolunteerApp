@@ -18,8 +18,6 @@ import com.example.jegarcia.volunteer.fragments.TaskFragment;
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
 
 import butterknife.BindView;
-import io.requery.Persistable;
-import io.requery.reactivex.ReactiveEntityStore;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TaskFragment.TaskCallbacks {
@@ -154,10 +152,5 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStop() {
         super.onStop();
-    }
-
-    public ReactiveEntityStore<Persistable> getData() {
-        VolunteerApplication volunteerApplication = (VolunteerApplication) getApplication();
-        return volunteerApplication.getData();
     }
 }

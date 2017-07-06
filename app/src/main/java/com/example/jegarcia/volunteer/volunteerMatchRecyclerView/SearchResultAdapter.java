@@ -8,19 +8,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.jegarcia.volunteer.MainActivity;
 import com.example.jegarcia.volunteer.R;
-import com.example.jegarcia.volunteer.models.OpportunitiesEntity;
+import com.example.jegarcia.volunteer.RealmHelper;
+import com.example.jegarcia.volunteer.models.volunteerMatchModels.Opportunities;
 import com.squareup.picasso.Picasso;
 
 import org.apache.axis.utils.StringUtils;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
-import io.requery.Persistable;
-import io.requery.reactivex.ReactiveEntityStore;
+import java.util.Set;
 
 import static com.example.jegarcia.volunteer.R.id.imageView;
 
@@ -30,26 +29,24 @@ import static com.example.jegarcia.volunteer.R.id.imageView;
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.OpportunitiesViewHolder> {
 
     private final Context mContext;
-    private List<OpportunitiesEntity> mDataset;
+    private List<Opportunities> mDataset;
+    private Set<Integer> ids;
     private int daysSince;
-    public RecyclerViewClickListener mListener;
+    private RecyclerViewClickListener mListener;
 
     public int getdaysSince() {
         return daysSince;
     }
 
-    private final ReactiveEntityStore<Persistable> data;
-
-
-    public static class OpportunitiesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class OpportunitiesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView id;
         private TextView title;
         private TextView updated;
         private TextView status;
         private ImageView image;
-        public RecyclerViewClickListener mListener;
+        RecyclerViewClickListener mListener;
 
-        public OpportunitiesViewHolder(View itemView, RecyclerViewClickListener listener) {
+        OpportunitiesViewHolder(View itemView, RecyclerViewClickListener listener) {
             super(itemView);
             mListener = listener;
             this.id = (TextView) itemView.findViewById(R.id.idView);
@@ -66,17 +63,18 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         }
     }
 
-    public SearchResultAdapter(List<OpportunitiesEntity> myDataset, Context context, RecyclerViewClickListener listener) {
+    public SearchResultAdapter(List<Opportunities> myDataset, Context context, RecyclerViewClickListener listener) {
         mDataset = myDataset;
+        ids = new HashSet<>();
+        RealmHelper.getOpportunities(this);
         mContext = context;
         mListener = listener;
-        data = ((MainActivity) context).getData();
     }
 
     // Create new views (invoked by the layout manager) all views from viewholder
     @Override
     public OpportunitiesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View viewHolderLayout = (View) LayoutInflater.from(parent.getContext()).inflate(R.layout.oppportunity_row, parent, false);
+        View viewHolderLayout = LayoutInflater.from(parent.getContext()).inflate(R.layout.oppportunity_row, parent, false);
         //set view's size, margins, padding here, layout params
 
         OpportunitiesViewHolder viewHolder = new OpportunitiesViewHolder(viewHolderLayout, mListener);
@@ -104,18 +102,25 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         return mDataset.size();
     }
 
-    public void addItems(List<OpportunitiesEntity> opportunities) {
+    public void addAndSaveItems(List<Opportunities> opportunities) {
+        addItems(opportunities);
+        RealmHelper.storeOpportunities(opportunities);
+    }
+
+    public void addItems(List<Opportunities> opportunities) {
         if (mDataset == null) {
             mDataset = new ArrayList<>();
         }
-        mDataset.addAll(opportunities);
-        for (OpportunitiesEntity opportunity: opportunities) {
-            data.insert(opportunity).toObservable();
+        for (Opportunities opportunity: opportunities) {
+            if (!ids.contains(opportunity.getOppId())) {
+                ids.add(opportunity.getOppId());
+                mDataset.add(opportunity);
+            }
         }
         notifyDataSetChanged();
     }
 
-    public OpportunitiesEntity getItemAtPosition(int position) {
+    public Opportunities getItemAtPosition(int position) {
         if (mDataset != null && mDataset.size() >= position - 1) {
             return mDataset.get(position);
         }

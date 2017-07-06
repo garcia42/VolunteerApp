@@ -1,21 +1,12 @@
 package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
-import com.example.jegarcia.volunteer.models.BaseObjectModel;
+import io.realm.RealmObject;
 
-import java.io.Serializable;
+public class Contact extends RealmObject {
 
-import io.requery.Entity;
-import io.requery.Generated;
-import io.requery.Key;
-import io.requery.ManyToOne;
-import io.requery.Persistable;
+    public Contact() {
 
-@Entity
-abstract class Contact extends BaseObjectModel implements Serializable, Persistable {
-
-    @Key
-    @Generated
-    int id;
+    }
 
     String created;
     String email;
@@ -24,7 +15,6 @@ abstract class Contact extends BaseObjectModel implements Serializable, Persista
     String phone;
     String updated;
 
-    @ManyToOne
     Location location;
     //        MemberFields[] memberFields;
 

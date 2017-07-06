@@ -31,7 +31,7 @@ import android.widget.Button;
 import com.example.jegarcia.volunteer.R;
 import com.example.jegarcia.volunteer.SearchOpportunitiesExample;
 import com.example.jegarcia.volunteer.VolunteerMatchApiService;
-import com.example.jegarcia.volunteer.models.OpportunitiesEntity;
+import com.example.jegarcia.volunteer.models.volunteerMatchModels.Opportunities;
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.EndlessRecyclerViewScrollListener;
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.RecyclerViewClickListener;
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
@@ -69,8 +69,8 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
             AppCompatActivity activity = (AppCompatActivity) v.getContext();
             OpportunityFragment organizationFragment = new OpportunityFragment();
             Bundle b = new Bundle();
-            OpportunitiesEntity opportunities = mAdapter.getItemAtPosition(position);
-            b.putInt("opportunity_id", opportunities.getId());
+            Opportunities opportunities = mAdapter.getItemAtPosition(position);
+            b.putInt("opportunity_id", opportunities.getOppId());
             organizationFragment.setArguments(b);
             activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, organizationFragment).addToBackStack(null).commit();
         }
@@ -104,13 +104,13 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
 
-        mAdapter = new SearchResultAdapter(new ArrayList<OpportunitiesEntity>(), getActivity(), this);
+        mAdapter = new SearchResultAdapter(new ArrayList<Opportunities>(), getActivity(), this);
         mRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to the bottom of the list
-                invokeTaskFragment(page, daysSince);
+                invokeTaskFragment(page + 1, daysSince);
             }
         });
 

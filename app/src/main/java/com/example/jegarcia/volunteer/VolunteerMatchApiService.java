@@ -71,7 +71,7 @@ public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
 //        MainActivity mainActivity = (MainActivity) mContext; //TODO specific recyclerView
 //        SearchResultAdapter searchResultAdapter = (SearchResultAdapter) recyclerView.getAdapter();
         OppSearchResult result = SearchOpportunitiesExample.parseResult(s);
-        adapter.addItems(result.getOpportunities());
+        adapter.addAndSaveItems(result.getOpportunities());
         super.onPostExecute(s);
     }
 

@@ -3,12 +3,9 @@ package com.example.jegarcia.volunteer;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 
-public class SugarExclusionStrategy implements ExclusionStrategy {
-    private Class<?> clazz;
+import io.realm.RealmList;
 
-    public SugarExclusionStrategy(Class<?> clazzToExclude) {
-        this.clazz = clazzToExclude;
-    }
+public class SugarExclusionStrategy implements ExclusionStrategy {
 
     @Override
     public boolean shouldSkipClass(Class<?> clazz) {
@@ -17,6 +14,6 @@ public class SugarExclusionStrategy implements ExclusionStrategy {
 
     @Override
     public boolean shouldSkipField(FieldAttributes f) {
-        return f.getDeclaringClass().getSuperclass().equals(clazz) && f.getName().toLowerCase().equals("id");
+        return f.getDeclaringClass().equals(RealmList.class);
     }
 }

@@ -1,7 +1,7 @@
 package com.example.jegarcia.volunteer.models.restModels;
 
 import com.example.jegarcia.volunteer.models.BaseObjectModel;
-import com.example.jegarcia.volunteer.models.OpportunitiesEntity;
+import com.example.jegarcia.volunteer.models.volunteerMatchModels.Opportunities;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class OppSearchResult extends BaseObjectModel {
     private Integer currentPage;
-    private ArrayList<OpportunitiesEntity> opportunities;
+    private ArrayList<Opportunities> opportunities;
     private Integer resultsSize;
     private String sortCriteria;
 
@@ -28,11 +28,11 @@ public class OppSearchResult extends BaseObjectModel {
         this.currentPage = currentPage;
     }
 
-    public ArrayList<OpportunitiesEntity> getOpportunities() {
+    public ArrayList<Opportunities> getOpportunities() {
         return opportunities;
     }
 
-    public void setOpportunities(ArrayList<OpportunitiesEntity> opportunities) {
+    public void setOpportunities(ArrayList<Opportunities> opportunities) {
         this.opportunities = opportunities;
     }
 

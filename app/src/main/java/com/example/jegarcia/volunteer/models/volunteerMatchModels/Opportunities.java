@@ -1,64 +1,45 @@
 package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
-import com.example.jegarcia.volunteer.models.BaseObjectModel;
-import com.example.jegarcia.volunteer.models.converters.StringArrayConverter;
-import com.google.gson.annotations.SerializedName;
+import com.example.jegarcia.volunteer.StringRealmListConverter;
+import com.google.gson.annotations.JsonAdapter;
 
-import java.io.Serializable;
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-import io.requery.Convert;
-import io.requery.Entity;
-import io.requery.Generated;
-import io.requery.Key;
-import io.requery.ManyToOne;
-import io.requery.OneToOne;
-import io.requery.Persistable;
+public class Opportunities extends RealmObject {
 
-@Entity
-public abstract class Opportunities extends BaseObjectModel implements Serializable, Persistable {
-
-    @Key
-    @Generated
-    int id;
-
-    @SerializedName("id")
-    Integer oppId;
+    @PrimaryKey
+    Integer id;
 
     String title;
     String updated;
     String status;
 
-    @OneToOne
-    AvailabilityEntity availability;
+    Availability availability;
     String imageUrl;
     String contact;
     String volunteersNeeded;
 
     String skillsNeeded;
 
-    @Convert(StringArrayConverter.class)
-    String[] greatFor;
+    @JsonAdapter(StringRealmListConverter.class)
+    RealmList<RealmString> greatFor;
 
-    @Convert(StringArrayConverter.class)
-    String[] descriptions;
+    @JsonAdapter(StringRealmListConverter.class)
+    RealmList<RealmString> descriptions;
 
     Integer minimumAge;
     Integer numReferred;
     Integer spacesAvailable;
 
-    @ManyToOne
     Organization parentOrg;
 
-    @ManyToOne
     Location location;
 
     boolean virtual;
     boolean requiresAddress;
     boolean hasWaitlist;
-
-    // Fields needed for db
-    Integer orgId;
-    Integer locationId;
 
     public boolean isHasWaitlist() {
         return hasWaitlist;
@@ -88,15 +69,15 @@ public abstract class Opportunities extends BaseObjectModel implements Serializa
         return location;
     }
 
-    public void setLocation(LocationEntity location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 
-    public OrganizationEntity getParentOrg() {
+    public Organization getParentOrg() {
         return parentOrg;
     }
 
-    public void setParentOrg(OrganizationEntity parentOrg) {
+    public void setParentOrg(Organization parentOrg) {
         this.parentOrg = parentOrg;
     }
 
@@ -124,19 +105,19 @@ public abstract class Opportunities extends BaseObjectModel implements Serializa
         this.minimumAge = minimumAge;
     }
 
-    public String[] getDescriptions() {
+    public RealmList<RealmString> getDescriptions() {
         return descriptions;
     }
 
-    public void setDescriptions(String[] descriptions) {
+    public void setDescriptions(RealmList<RealmString> descriptions) {
         this.descriptions = descriptions;
     }
 
-    public String[] getGreatFor() {
+    public RealmList<RealmString> getGreatFor() {
         return greatFor;
     }
 
-    public void setGreatFor(String[] greatFor) {
+    public void setGreatFor(RealmList<RealmString> greatFor) {
         this.greatFor = greatFor;
     }
 
@@ -176,7 +157,7 @@ public abstract class Opportunities extends BaseObjectModel implements Serializa
         return availability;
     }
 
-    public void setAvailability(AvailabilityEntity availability) {
+    public void setAvailability(Availability availability) {
         this.availability = availability;
     }
 
@@ -197,11 +178,11 @@ public abstract class Opportunities extends BaseObjectModel implements Serializa
     }
 
     public Integer getOppId() {
-        return oppId;
+        return id;
     }
 
     public void setoppId(Integer id) {
-        this.oppId = id;
+        this.id = id;
     }
 
     public String getTitle() {

@@ -1,32 +1,21 @@
 package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
-import com.example.jegarcia.volunteer.models.BaseObjectModel;
-import com.example.jegarcia.volunteer.models.converters.IntegerArrayConverter;
-import com.google.gson.annotations.SerializedName;
+import com.example.jegarcia.volunteer.RealmIntListConverter;
+import com.google.gson.annotations.JsonAdapter;
 
-import java.io.Serializable;
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-import io.requery.Convert;
-import io.requery.Entity;
-import io.requery.Generated;
-import io.requery.Key;
-import io.requery.ManyToOne;
-import io.requery.Persistable;
+public class Organization extends RealmObject {
 
-@Entity
-public abstract class Organization extends BaseObjectModel implements Serializable, Persistable {
-
-    @Key
-    @Generated
-    int id;
+    @PrimaryKey
+    Integer id;
 
     int avgRating;
 
-    @SerializedName("id")
-    Integer orgId;
-
-    @Convert(IntegerArrayConverter.class)
-    int[] categoryIds;
+    @JsonAdapter(RealmIntListConverter.class)
+    RealmList<RealmInt> categoryIds;
 
     String created;
     String description;
@@ -41,10 +30,8 @@ public abstract class Organization extends BaseObjectModel implements Serializab
     String vmUrl;
     String url;
 
-    @ManyToOne
     Contact contact;
 
-    @ManyToOne
     Location location;
 
     public Location getLocation() {
@@ -159,20 +146,20 @@ public abstract class Organization extends BaseObjectModel implements Serializab
         this.created = created;
     }
 
-    public int[] getCategoryIds() {
+    public RealmList<RealmInt> getCategoryIds() {
         return categoryIds;
     }
 
-    public void setCategoryIds(int[] categoryIds) {
+    public void setCategoryIds(RealmList<RealmInt> categoryIds) {
         this.categoryIds = categoryIds;
     }
 
     public Integer getOrgId() {
-        return orgId;
+        return id;
     }
 
     public void setOrgId(Integer id) {
-        this.orgId = id;
+        this.id = id;
     }
 
     public int getAvgRating() {

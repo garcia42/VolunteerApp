@@ -1,21 +1,8 @@
 package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
-import com.example.jegarcia.volunteer.models.BaseObjectModel;
+import io.realm.RealmObject;
 
-import java.io.Serializable;
-
-import io.requery.Entity;
-import io.requery.Generated;
-import io.requery.Key;
-import io.requery.OneToOne;
-import io.requery.Persistable;
-
-@Entity
-public abstract class Location extends BaseObjectModel implements Serializable, Persistable {
-
-    @Key
-    @Generated
-    int id;
+public class Location extends RealmObject {
 
     String city;
     String country;
@@ -25,7 +12,6 @@ public abstract class Location extends BaseObjectModel implements Serializable, 
     String street2;
     String street3;
 
-    @OneToOne
     GeoLocation geoLocation;
 
     public String getCountry() {

@@ -1,20 +1,8 @@
 package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
-import com.example.jegarcia.volunteer.models.BaseObjectModel;
+import io.realm.RealmObject;
 
-import java.io.Serializable;
-
-import io.requery.Entity;
-import io.requery.Generated;
-import io.requery.Key;
-import io.requery.Persistable;
-
-@Entity
-public abstract class Availability extends BaseObjectModel implements Serializable, Persistable {
-
-    @Key
-    @Generated
-    int id;
+public class Availability extends RealmObject {
 
     String endDate;
     String endTime;
