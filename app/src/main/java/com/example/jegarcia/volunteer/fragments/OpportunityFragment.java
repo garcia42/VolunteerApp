@@ -23,9 +23,6 @@ import io.realm.RealmResults;
 
 public class OpportunityFragment extends Fragment {
 
-    @BindView(R.id.idView)
-    TextView idView;
-
     @BindView(R.id.titleView)
     TextView titleView;
 
@@ -119,7 +116,6 @@ public class OpportunityFragment extends Fragment {
                         updatedView.setText(String.valueOf(opportunity.getUpdated()));
                         titleView.setText(String.valueOf(opportunity.getTitle()));
                         statusView.setText(String.valueOf(opportunity.getStatus()));
-                        idView.setText(String.valueOf(opportunity.getOppId()));
 
                         if (!StringUtils.isEmpty(opportunity.getImageUrl())) {
                             String decodedUrl = URLDecoder.decode(opportunity.getImageUrl());

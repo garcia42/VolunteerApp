@@ -13,6 +13,8 @@ public class Opportunities extends RealmObject {
     Integer id;
 
     String title;
+
+    //ex "2010-07-02T10:23:46-0700"
     String updated;
     String status;
 

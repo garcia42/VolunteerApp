@@ -24,7 +24,7 @@ public class VolunteerRequestUtils {
         //Private Constructor so it can't be created
     }
 
-    public static String formatDate(int daysSince) {
+    static String formatDate(int daysSince) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -daysSince);
         return dateFormat.format(calendar.getTime());
@@ -41,7 +41,7 @@ public class VolunteerRequestUtils {
         return dateAndTimeFormat.format(updatedSince);
     }
 
-    public static boolean isExpiredOpportunity(Opportunities opportunity) {
+    static boolean isExpiredOpportunity(Opportunities opportunity) {
         if (opportunity.getAvailability() != null
                 && !StringUtils.isEmpty(opportunity.getAvailability().getEndDate())) {
             String endDateString = opportunity.getAvailability().getEndDate();
@@ -49,10 +49,11 @@ public class VolunteerRequestUtils {
 //            if (!StringUtils.isEmpty(opportunity.getAvailability().getEndTime())) { //End time could be null //TODO add time to expire
 //                endDateString += " " + opportunity.getAvailability().getEndTime();
 //            }
+            //TODO Can allow them to save events here, just don't erase it
             DateTime endDate = jodaDateFormat.parseDateTime(endDateString);
             DateTime lastUpdated = !StringUtils.isEmpty(lastUpdatedString) ? jodaDateFormat.parseDateTime(lastUpdatedString) : new DateTime();
 
-            if (endDate.isBefore(new DateTime()) || lastUpdated.isBefore(new DateTime().minusMonths(2))) {
+            if (endDate.isBefore(new DateTime()) || lastUpdated.isBefore(new DateTime().minusWeeks(1))) {
                 return true;
             }
         }

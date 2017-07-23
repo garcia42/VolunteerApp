@@ -5,8 +5,8 @@ import io.realm.RealmObject;
 public class GeoLocation extends RealmObject {
 
     String accuracy;
-    long latitude;
-    long longitude;
+    double latitude;
+    double longitude;
 
     public String getAccuracy() {
         return accuracy;
@@ -16,19 +16,19 @@ public class GeoLocation extends RealmObject {
         this.accuracy = accuracy;
     }
 
-    public long getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(long latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public long getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(long longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 }

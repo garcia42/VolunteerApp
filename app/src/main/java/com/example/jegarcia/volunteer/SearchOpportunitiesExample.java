@@ -24,7 +24,6 @@ public class SearchOpportunitiesExample {
     public static final String SEARCH_OPPORTUNITIES = "searchOpportunities";
 
     private static String url="http://www.stage.volunteermatch.org/api/call";
-    private static int displayCount = 3;
 //    private static String updatedSince = "2015-04-05T00:00:00Z";
 
     public static final String TAG = VolunteerMatchApiService.class.getName();

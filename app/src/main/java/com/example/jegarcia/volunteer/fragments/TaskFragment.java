@@ -82,7 +82,7 @@ public class TaskFragment extends Fragment {
         MainActivity mainActivity = (MainActivity) getContext();
         SearchResultAdapter adapter = mainActivity.getAdapter();
 
-        mTask = new VolunteerMatchApiService(adapter);
+        mTask = new VolunteerMatchApiService(getContext());
         mTask.execute(restMethod, searchQuery, httpMethod);
 
     }

@@ -16,18 +16,23 @@ package com.example.jegarcia.volunteer.fragments;
 */
 
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.jegarcia.volunteer.MainActivity;
 import com.example.jegarcia.volunteer.R;
 import com.example.jegarcia.volunteer.SearchOpportunitiesExample;
 import com.example.jegarcia.volunteer.VolunteerMatchApiService;
@@ -36,7 +41,8 @@ import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.EndlessRecycler
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.RecyclerViewClickListener;
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
 
-import java.util.ArrayList;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 import static com.example.jegarcia.volunteer.VolunteerRequestUtils.daysSince;
 import static com.example.jegarcia.volunteer.VolunteerRequestUtils.formatDateAndTime;
@@ -51,6 +57,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
     private static final String KEY_LAYOUT_MANAGER = "layoutManager";
     private static final int SPAN_COUNT = 2;
     private static final String TAG_TASK_FRAGMENT = "tag_task_fragment";
+    private static final String KEY_LAYOUT_STATE = "layoutManagerState";
 
     private enum LayoutManagerType {
         GRID_LAYOUT_MANAGER,
@@ -62,6 +69,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
     protected SearchResultAdapter mAdapter;
     protected LinearLayoutManager mLayoutManager;
     private TaskFragment mTaskFragment;
+    private Realm realm;
 
     @Override
     public void recyclerViewListClicked(View v, int position) {
@@ -69,8 +77,12 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
             AppCompatActivity activity = (AppCompatActivity) v.getContext();
             OpportunityFragment organizationFragment = new OpportunityFragment();
             Bundle b = new Bundle();
-            Opportunities opportunities = mAdapter.getItemAtPosition(position);
-            b.putInt("opportunity_id", opportunities.getOppId());
+            Opportunities opportunities = mAdapter.getItem(position);
+            if (opportunities != null) {
+                b.putInt("opportunity_id", opportunities.getOppId());
+            } else {
+                Log.e(TAG, "Opportunity null when showing oppFragment");
+            }
             organizationFragment.setArguments(b);
             activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, organizationFragment).addToBackStack(null).commit();
         }
@@ -79,6 +91,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        invokeTaskFragment(0, daysSince);
     }
 
     @Override
@@ -103,8 +116,14 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
         }
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
+//        ((MainActivity) getActivity()).resetRealm();
+        realm = ((MainActivity) getActivity()).getRealm();
 
-        mAdapter = new SearchResultAdapter(new ArrayList<Opportunities>(), getActivity(), this);
+        RealmResults<Opportunities> opportunitiesRealmResults = realm
+                .where(Opportunities.class).findAllAsync();
+//                .findAllSorted("id", Sort.ASCENDING);
+
+        mAdapter = new SearchResultAdapter(opportunitiesRealmResults, getActivity(), this);
         mRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
@@ -113,10 +132,10 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
                 invokeTaskFragment(page + 1, daysSince);
             }
         });
-
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
+                DividerItemDecoration.VERTICAL));
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
-        initDataset();
         setupMap(rootView);
 
         return rootView;
@@ -126,15 +145,19 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save currently selected layout manager.
         savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
+        savedInstanceState.putParcelable(KEY_LAYOUT_STATE, mRecyclerView.getLayoutManager().onSaveInstanceState());
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    /**
-     * Generates Strings for RecyclerView's adapter. This data would usually come
-     * from a local content provider or remote server.
-     */
-    private void initDataset() {
-        invokeTaskFragment(0, daysSince);
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if(savedInstanceState != null)
+        {
+            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(KEY_LAYOUT_MANAGER);
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+        }
     }
 
     private void invokeTaskFragment(int pageNumber, int daysSince) {

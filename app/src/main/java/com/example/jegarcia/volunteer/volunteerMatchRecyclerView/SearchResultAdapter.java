@@ -1,6 +1,7 @@
 package com.example.jegarcia.volunteer.volunteerMatchRecyclerView;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,51 +10,42 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.jegarcia.volunteer.R;
-import com.example.jegarcia.volunteer.RealmHelper;
 import com.example.jegarcia.volunteer.models.volunteerMatchModels.Opportunities;
 import com.squareup.picasso.Picasso;
 
 import org.apache.axis.utils.StringUtils;
 
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
-import static com.example.jegarcia.volunteer.R.id.imageView;
+import io.realm.RealmRecyclerViewAdapter;
+import io.realm.RealmResults;
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
-public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.OpportunitiesViewHolder> {
+public class SearchResultAdapter extends RealmRecyclerViewAdapter<Opportunities, SearchResultAdapter.OpportunitiesViewHolder> {
 
     private final Context mContext;
-    private List<Opportunities> mDataset;
-    private Set<Integer> ids;
-    private int daysSince;
     private RecyclerViewClickListener mListener;
 
-    public int getdaysSince() {
-        return daysSince;
-    }
-
     static class OpportunitiesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView id;
         private TextView title;
         private TextView updated;
         private TextView status;
+        private TextView parentOrg;
+        private TextView oppDay;
         private ImageView image;
         RecyclerViewClickListener mListener;
 
         OpportunitiesViewHolder(View itemView, RecyclerViewClickListener listener) {
             super(itemView);
             mListener = listener;
-            this.id = (TextView) itemView.findViewById(R.id.idView);
             this.title = (TextView) itemView.findViewById(R.id.titleView);
             this.updated = (TextView) itemView.findViewById(R.id.updatedView);
             this.status = (TextView) itemView.findViewById(R.id.statusView);
-            this.image = (ImageView) itemView.findViewById(imageView);
+            this.image = (ImageView) itemView.findViewById(R.id.imageView);
+            this.parentOrg = (TextView) itemView.findViewById(R.id.parentOrg);
+            this.oppDay = (TextView) itemView.findViewById(R.id.oppDay);
             itemView.setOnClickListener(this);
         }
 
@@ -63,11 +55,9 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         }
     }
 
-    public SearchResultAdapter(List<Opportunities> myDataset, Context context, RecyclerViewClickListener listener) {
-        mDataset = myDataset;
-        ids = new HashSet<>();
-        RealmHelper.getOpportunities(this);
-        mContext = context;
+    public SearchResultAdapter(RealmResults<Opportunities> myDataset, Context context, RecyclerViewClickListener listener) {
+        super(myDataset, true);
+        this.mContext = context;
         mListener = listener;
     }
 
@@ -86,44 +76,26 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     // - replace the contents of the view with that element
     @Override
     public void onBindViewHolder(OpportunitiesViewHolder holder, int position) {
-        holder.id.setText(String.valueOf(mDataset.get(position).getOppId()));
-        holder.title.setText(mDataset.get(position).getTitle());
-        holder.updated.setText(mDataset.get(position).getUpdated());
-        holder.status.setText(mDataset.get(position).getStatus());
+        Opportunities opportunity = getItem(position);
+        holder.title.setText(opportunity.getTitle());
+        holder.updated.setText(opportunity.getUpdated());
+        holder.status.setText(opportunity.getStatus());
+        if (!StringUtils.isEmpty(opportunity.getAvailability().getStartDate())) {
+            holder.oppDay.setText(opportunity.getAvailability().getStartDate());
+        } else {
+            holder.oppDay.setText(mContext.getString(R.string.opp_day));
+        }
+        holder.parentOrg.setText(opportunity.getParentOrg().getName());
 
-        if (!StringUtils.isEmpty(mDataset.get(position).getImageUrl())) {
-            String decodedUrl = URLDecoder.decode(mDataset.get(position).getImageUrl());
+        if (!StringUtils.isEmpty(opportunity.getImageUrl())) {
+            String decodedUrl = URLDecoder.decode(opportunity.getImageUrl());
             Picasso.with(mContext).load(decodedUrl).into(holder.image);
         }
     }
 
+    @Nullable
     @Override
-    public int getItemCount() {
-        return mDataset.size();
-    }
-
-    public void addAndSaveItems(List<Opportunities> opportunities) {
-        addItems(opportunities);
-        RealmHelper.storeOpportunities(opportunities);
-    }
-
-    public void addItems(List<Opportunities> opportunities) {
-        if (mDataset == null) {
-            mDataset = new ArrayList<>();
-        }
-        for (Opportunities opportunity: opportunities) {
-            if (!ids.contains(opportunity.getOppId())) {
-                ids.add(opportunity.getOppId());
-                mDataset.add(opportunity);
-            }
-        }
-        notifyDataSetChanged();
-    }
-
-    public Opportunities getItemAtPosition(int position) {
-        if (mDataset != null && mDataset.size() >= position - 1) {
-            return mDataset.get(position);
-        }
-        return null;
+    public Opportunities getItem(int index) {
+        return super.getItem(index);
     }
 }

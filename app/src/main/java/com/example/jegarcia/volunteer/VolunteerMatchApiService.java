@@ -1,11 +1,11 @@
 package com.example.jegarcia.volunteer;
 
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.jegarcia.volunteer.models.restModels.OppSearchResult;
-import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
 
 import org.apache.axis.encoding.Base64;
 
@@ -24,11 +24,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by jegarcia on 2/4/17.
- */
 public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
 
+    private final Context mContext;
     private WSSECredentials wsse = null;
     private static final DateFormat DATETIME_FORMAT =  new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     private static final String CHARSET = "UTF-8";
@@ -39,10 +37,9 @@ public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
 
     public static final String HTTP_METHOD_GET = "GET";
     private static final String TAG = VolunteerMatchApiService.class.getName();
-    private SearchResultAdapter adapter;
 
-    public VolunteerMatchApiService(SearchResultAdapter adapter) {
-        this.adapter = adapter;
+    public VolunteerMatchApiService(Context context) {
+        this.mContext = context;
     }
 
     // SEARCH_OPPORTUNITIES, searchOppsQuery, "GET", user, key
@@ -68,10 +65,8 @@ public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String s) {
-//        MainActivity mainActivity = (MainActivity) mContext; //TODO specific recyclerView
-//        SearchResultAdapter searchResultAdapter = (SearchResultAdapter) recyclerView.getAdapter();
         OppSearchResult result = SearchOpportunitiesExample.parseResult(s);
-        adapter.addAndSaveItems(result.getOpportunities());
+        RealmHelper.saveOpportunitiesAndGetData(result.getOpportunities(), mContext);
         super.onPostExecute(s);
     }
 
@@ -238,10 +233,6 @@ public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
         }
 
         return null;
-    }
-
-    public void setAdapter(SearchResultAdapter adapter) {
-        this.adapter = adapter;
     }
 
     public void setApiUrl(String url) {

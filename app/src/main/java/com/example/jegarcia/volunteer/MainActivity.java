@@ -2,11 +2,7 @@ package com.example.jegarcia.volunteer;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -18,14 +14,17 @@ import com.example.jegarcia.volunteer.fragments.TaskFragment;
 import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
 
 import butterknife.BindView;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TaskFragment.TaskCallbacks {
+public class MainActivity extends AppCompatActivity implements TaskFragment.TaskCallbacks {
 
     RecyclerViewFragment volunteerListFragment;
+    private RealmConfiguration realmConfiguration;
 
     @BindView(R.id.content_frame)
     FrameLayout frameLayout;
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,14 +33,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        realm = Realm.getDefaultInstance();
+        RealmHelper.removeOldEvents(this); //TODO do this less frequently
 
         if (savedInstanceState == null) {
             volunteerListFragment = new RecyclerViewFragment();
@@ -57,12 +50,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     @Override
@@ -85,31 +73,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     public static boolean isEmulator() {
@@ -150,7 +113,26 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
+    }
+
+    public RealmConfiguration getRealmConfig() {
+        if (realmConfiguration == null) {
+            realmConfiguration = new RealmConfiguration
+                    .Builder()
+                    .deleteRealmIfMigrationNeeded()
+                    .build();
+        }
+        return realmConfiguration;
+    }
+
+    public void resetRealm() {
+        Realm.deleteRealm(getRealmConfig());
+    }
+
+    public Realm getRealm() {
+        return this.realm;
     }
 }
