@@ -1,6 +1,6 @@
 package com.example.jegarcia.volunteer.models.volunteerMatchModels;
 
-import com.example.jegarcia.volunteer.StringRealmListConverter;
+import com.example.jegarcia.volunteer.models.StringRealmListConverter;
 import com.google.gson.annotations.JsonAdapter;
 
 import io.realm.RealmList;

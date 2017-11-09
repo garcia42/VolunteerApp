@@ -1,4 +1,4 @@
-package com.example.jegarcia.volunteer;
+package com.example.jegarcia.volunteer.ui;
 
 import com.example.jegarcia.volunteer.models.restModels.OppSearchQuery;
 import com.example.jegarcia.volunteer.models.restModels.OppSearchResult;
@@ -7,7 +7,7 @@ import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 
-import static com.example.jegarcia.volunteer.VolunteerRequestUtils.formatDate;
+import static com.example.jegarcia.volunteer.ui.VolunteerRequestUtils.formatDate;
 
 /**
  * Simple command line example of how one can call the VolunteerMatch public API to retrieve a list of opportunities.
@@ -31,9 +31,9 @@ public class SearchOpportunitiesExample {
     private SearchOpportunitiesExample() {
     }
 
-    public static String buildSearchOppsQuery(int pageNumber, String updatedSince, int daysSince) {
+    public static String buildSearchOppsQuery(int pageNumber, String updatedSince, int daysSince, String location) {
         OppSearchQuery oq = new OppSearchQuery();
-        oq.setLocation("san francisco"); //TODO should be dynamic
+        oq.setLocation(location); //TODO should be dynamic
         oq.setRadius("city");//TODO maybe this could expand?
         ArrayList<OppSearchQuery.DateRange> dateRanges = new ArrayList<>();
         OppSearchQuery.DateRange dr = new OppSearchQuery.DateRange();

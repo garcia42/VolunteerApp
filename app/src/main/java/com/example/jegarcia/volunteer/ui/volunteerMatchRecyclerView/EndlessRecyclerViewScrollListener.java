@@ -1,4 +1,4 @@
-package com.example.jegarcia.volunteer.volunteerMatchRecyclerView;
+package com.example.jegarcia.volunteer.ui.volunteerMatchRecyclerView;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;

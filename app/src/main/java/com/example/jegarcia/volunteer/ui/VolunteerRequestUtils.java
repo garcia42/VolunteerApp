@@ -1,4 +1,4 @@
-package com.example.jegarcia.volunteer;
+package com.example.jegarcia.volunteer.ui;
 
 import com.example.jegarcia.volunteer.models.volunteerMatchModels.Opportunities;
 
@@ -19,6 +19,8 @@ public class VolunteerRequestUtils {
     private static final DateTimeFormatter jodaDateFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final SimpleDateFormat dateAndTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     public static final int daysSince = 15;
+
+    public static final String LOCATION = "LOCATION";
 
     private VolunteerRequestUtils() {
         //Private Constructor so it can't be created

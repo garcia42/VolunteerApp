@@ -1,44 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.example.jegarcia.volunteer.MainActivity">
+<com.example.jegarcia.volunteer.ui.NonSwipeViewPager
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:id="@+id/pager"
+android:layout_height="match_parent"
+android:layout_width="match_parent">
 
-    <android.support.design.widget.AppBarLayout
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_gravity="top" />
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-    </android.support.design.widget.AppBarLayout>
-
-    <FrameLayout
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/content_frame">
-
-    </FrameLayout>
-
-    <!--<LinearLayout-->
-    <!--android:id="@+id/recyclerViewHolder"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:orientation="vertical">-->
-
-    <!--<include android:id="@+id/recyclerView0" layout="@layout/content_main" />-->
-    <!--<include android:id="@+id/recyclerView1" layout="@layout/content_main" />-->
-    <!--<include android:id="@+id/recyclerView2" layout="@layout/content_main" />-->
-
-    <!--</LinearLayout>-->
-
-</android.support.design.widget.CoordinatorLayout>
+</com.example.jegarcia.volunteer.ui.NonSwipeViewPager>

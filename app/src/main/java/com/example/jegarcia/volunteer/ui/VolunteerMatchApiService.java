@@ -1,4 +1,4 @@
-package com.example.jegarcia.volunteer;
+package com.example.jegarcia.volunteer.ui;
 
 
 import android.content.Context;
@@ -66,6 +66,7 @@ public class VolunteerMatchApiService extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String s) {
         OppSearchResult result = SearchOpportunitiesExample.parseResult(s);
+        Log.d(TAG, "Number of Opportunities Found: " + result.getOpportunities().size());
         RealmHelper.saveOpportunitiesAndGetData(result.getOpportunities(), mContext);
         super.onPostExecute(s);
     }

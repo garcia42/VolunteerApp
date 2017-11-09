@@ -1,12 +1,10 @@
-package com.example.jegarcia.volunteer.fragments;
+package com.example.jegarcia.volunteer.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import com.example.jegarcia.volunteer.MainActivity;
-import com.example.jegarcia.volunteer.VolunteerMatchApiService;
-import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
+import com.example.jegarcia.volunteer.ui.volunteerMatchRecyclerView.SearchResultAdapter;
 
 /**
  * This Fragment manages a single background task and retains
@@ -79,7 +77,7 @@ public class TaskFragment extends Fragment {
 //        String searchQuery = getArguments().getString("query", "");
 //        String restMethod = getArguments().getString("restMethod", "searchOpportunities");
 
-        MainActivity mainActivity = (MainActivity) getContext();
+        Map.MainActivity mainActivity = (Map.MainActivity) getContext();
         SearchResultAdapter adapter = mainActivity.getAdapter();
 
         mTask = new VolunteerMatchApiService(getContext());

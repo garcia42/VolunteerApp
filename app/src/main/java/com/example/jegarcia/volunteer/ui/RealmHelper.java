@@ -1,4 +1,4 @@
-package com.example.jegarcia.volunteer;
+package com.example.jegarcia.volunteer.ui;
 
 import android.content.Context;
 import android.location.Address;
@@ -13,6 +13,7 @@ import org.apache.axis.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -25,7 +26,7 @@ class RealmHelper {
     }
 
     private static void storeLatLongs(final List<Opportunities> opportunities, final Context context) {
-        Realm realmConfig = ((MainActivity) context).getRealm();
+        Realm realmConfig = ((Map.MainActivity) context).getRealm();
 
         realmConfig.executeTransactionAsync(new Realm.Transaction() {
 
@@ -48,7 +49,7 @@ class RealmHelper {
     }
 
     static void storeOpportunities(final List<Opportunities> opportunities, Context context) {
-        Realm realmConfig = ((MainActivity) context).getRealm();
+        Realm realmConfig = ((Map.MainActivity) context).getRealm();
         realmConfig.executeTransactionAsync(new Realm.Transaction() {
 
             @Override
@@ -68,7 +69,7 @@ class RealmHelper {
     }
 
     static void removeOldEvents(Context context) {
-        Realm realmConfig = ((MainActivity) context).getRealm();
+        Realm realmConfig = ((Map.MainActivity) context).getRealm();
         realmConfig.executeTransactionAsync(new Realm.Transaction() {
 
             @Override
@@ -98,5 +99,19 @@ class RealmHelper {
             // handle exception
         }
         return null;
+    }
+
+    public static String getCityFromPosition(Context context, double longitude, double latitude) {
+        Geocoder geoCoder = new Geocoder(context, Locale.getDefault()); //it is Geocoder
+        StringBuilder builder = new StringBuilder();
+        try {
+            List<Address> address = geoCoder.getFromLocation(latitude, longitude, 1);
+            builder.append(address.get(0).getLocality());
+        } catch (IOException e) {
+
+        } catch (NullPointerException e) {
+
+        }
+        return builder.toString();
     }
 }

@@ -1,4 +1,4 @@
-package com.example.jegarcia.volunteer;
+package com.example.jegarcia.volunteer.models;
 
 import com.example.jegarcia.volunteer.models.volunteerMatchModels.RealmString;
 import com.google.gson.JsonArray;

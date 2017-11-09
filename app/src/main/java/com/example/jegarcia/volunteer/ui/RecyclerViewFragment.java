@@ -1,4 +1,4 @@
-package com.example.jegarcia.volunteer.fragments;
+package com.example.jegarcia.volunteer.ui;
 /*
 * Copyright (C) 2014 The Android Open Source Project
 *
@@ -20,7 +20,6 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
@@ -30,22 +29,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
-import com.example.jegarcia.volunteer.MainActivity;
 import com.example.jegarcia.volunteer.R;
-import com.example.jegarcia.volunteer.SearchOpportunitiesExample;
-import com.example.jegarcia.volunteer.VolunteerMatchApiService;
 import com.example.jegarcia.volunteer.models.volunteerMatchModels.Opportunities;
-import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.EndlessRecyclerViewScrollListener;
-import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.RecyclerViewClickListener;
-import com.example.jegarcia.volunteer.volunteerMatchRecyclerView.SearchResultAdapter;
+import com.example.jegarcia.volunteer.ui.volunteerMatchRecyclerView.EndlessRecyclerViewScrollListener;
+import com.example.jegarcia.volunteer.ui.volunteerMatchRecyclerView.RecyclerViewClickListener;
+import com.example.jegarcia.volunteer.ui.volunteerMatchRecyclerView.SearchResultAdapter;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-import static com.example.jegarcia.volunteer.VolunteerRequestUtils.daysSince;
-import static com.example.jegarcia.volunteer.VolunteerRequestUtils.formatDateAndTime;
+import static com.example.jegarcia.volunteer.ui.VolunteerRequestUtils.LOCATION;
+import static com.example.jegarcia.volunteer.ui.VolunteerRequestUtils.daysSince;
+import static com.example.jegarcia.volunteer.ui.VolunteerRequestUtils.formatDateAndTime;
 
 /**
  * Demonstrates the use of {@link RecyclerView} with a {@link LinearLayoutManager} and a
@@ -58,6 +54,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
     private static final int SPAN_COUNT = 2;
     private static final String TAG_TASK_FRAGMENT = "tag_task_fragment";
     private static final String KEY_LAYOUT_STATE = "layoutManagerState";
+    private String location;
 
     private enum LayoutManagerType {
         GRID_LAYOUT_MANAGER,
@@ -84,13 +81,17 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
                 Log.e(TAG, "Opportunity null when showing oppFragment");
             }
             organizationFragment.setArguments(b);
-            activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, organizationFragment).addToBackStack(null).commit();
+//            activity.getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, organizationFragment).addToBackStack(null).commit(); //TODO make this an activity
         }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            location = bundle.getString(LOCATION, "");
+        }
         invokeTaskFragment(0, daysSince);
     }
 
@@ -117,7 +118,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
 //        ((MainActivity) getActivity()).resetRealm();
-        realm = ((MainActivity) getActivity()).getRealm();
+        realm = ((Map.MainActivity) getActivity()).getRealm();
 
         RealmResults<Opportunities> opportunitiesRealmResults = realm
                 .where(Opportunities.class).findAllAsync();
@@ -136,7 +137,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
                 DividerItemDecoration.VERTICAL));
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
-        setupMap(rootView);
+//        setupMap(rootView);
 
         return rootView;
     }
@@ -164,7 +165,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
         FragmentManager fm = getActivity().getSupportFragmentManager();
         mTaskFragment = (TaskFragment) fm.findFragmentByTag(TAG_TASK_FRAGMENT);
         String updatedSince = formatDateAndTime(daysSince);
-        String searchOppsQuery = SearchOpportunitiesExample.buildSearchOppsQuery(pageNumber, updatedSince, daysSince);
+        String searchOppsQuery = SearchOpportunitiesExample.buildSearchOppsQuery(pageNumber, updatedSince, daysSince, location);
         boolean start = true;
         if (mTaskFragment == null) {
             mTaskFragment = new TaskFragment();
@@ -174,18 +175,18 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
         mTaskFragment.updateData(0, VolunteerMatchApiService.HTTP_METHOD_GET, searchOppsQuery, SearchOpportunitiesExample.SEARCH_OPPORTUNITIES, start);
     }
 
-    private void setupMap(View v) {
-        Button mapButton = (Button) v.findViewById(R.id.mapButton);
-        mapButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, new Map());
-                ft.addToBackStack(null);
-                ft.commit();
-            }
-        });
-    }
+//    private void setupMap(View v) {
+//        Button mapButton = (Button) v.findViewById(R.id.mapButton);
+//        mapButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+//                ft.replace(R.id.content_frame, new Map());
+//                ft.addToBackStack(null);
+//                ft.commit();
+//            }
+//        });
+//    }
 
     /**
      * Set RecyclerView's LayoutManager to the one given.
