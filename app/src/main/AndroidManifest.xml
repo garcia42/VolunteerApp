@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.jegarcia.volunteer">
+    package="com.example.jegarcia.VolunteerMaps">
     <uses-permission android:name="android.permission.INTERNET" />
 
     <permission
-        android:name="com.example.jegarcia.volunteer.permission.MAPS_RECEIVE"
+        android:name="com.example.jegarcia.VolunteerMaps.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
 
     <uses-feature
@@ -25,13 +25,13 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".VolunteerApplication"
+        android:name="com.example.jegarcia.VolunteerMaps.VolunteerApplication"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.Map$MainActivity"
+            android:name="com.example.jegarcia.VolunteerMaps.ui.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -41,13 +41,19 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.example.jegarcia.VolunteerMaps.ui.OpportunityActivity"
+            android:label="Description"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAG0Sz_IDTvn4uav6T0iPjltuF_pVQfenc" />
+            android:value="@string/google_maps_api_key" />
     </application>
 
 </manifest>

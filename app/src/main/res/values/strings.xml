@@ -1,10 +1,13 @@
 <resources>
-    <string name="app_name">Volunteer</string>
+    <string name="app_name">VolunteerMaps</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
     <string name="map">Map</string>
-    <string name="opp_day">It\'s flexible! We\'ll work with your schedule</string>
+    <string name="opp_day">Ongoing</string>
+    <string name="splash_text">Find Opportunities in Your Area!</string>
+    <string name="redo_search">REDO SEARCH IN THIS AREA</string>
+    <string name="transparent_warning">Many locations shown are approximations. Please contact the organization before travelling</string>
 </resources>

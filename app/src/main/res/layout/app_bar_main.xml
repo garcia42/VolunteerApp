@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.jegarcia.volunteer.ui.NonSwipeViewPager
+<com.example.jegarcia.VolunteerMaps.ui.NonSwipeViewPager
 xmlns:android="http://schemas.android.com/apk/res/android"
 android:id="@+id/pager"
 android:layout_height="match_parent"
 android:layout_width="match_parent">
 
     <android.support.design.widget.TabLayout
+        android:background="#ecf0f1"
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top" />
 
-</com.example.jegarcia.volunteer.ui.NonSwipeViewPager>
+</com.example.jegarcia.VolunteerMaps.ui.NonSwipeViewPager>

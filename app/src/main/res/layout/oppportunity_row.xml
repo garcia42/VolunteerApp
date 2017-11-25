@@ -1,50 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_margin="8dp"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content" >
+
+    <com.varunest.sparkbutton.SparkButton
+        android:id="@+id/star_button"
+        android:layout_gravity="bottom|end"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        app:sparkbutton_activeImage="@drawable/heart_on"
+        app:sparkbutton_iconSize="30dp"
+        app:sparkbutton_inActiveImage="@drawable/heart_off"
+        app:sparkbutton_primaryColor="@color/colorPrimary"
+        app:sparkbutton_secondaryColor="@color/spark_secondary_color" />
 
     <LinearLayout
-        android:layout_width="235dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/titleView"
             android:text="Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:text="Last Updated"
-            android:id="@+id/updatedView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:text="Status"
-            android:id="@+id/statusView"
-            android:layout_width="match_parent"
+            android:textSize="18sp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:textColor="#124d9b"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/parentOrg"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal"
             android:text="Parent Organization"/>
 
+
         <TextView
+            android:id="@+id/oppDay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/oppDay"
-            android:text="@string/opp_day"/>
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/opp_day"
+            android:textColor="#29961b" />
+
+        <ImageView
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/volunteer"
+            android:layout_width="160dp"
+            android:layout_height="110dp"
+            android:layout_margin="3dp"
+            android:id="@+id/imageView"/>
 
     </LinearLayout>
 
-    <ImageView
-        android:src="@drawable/volunteer"
-        android:layout_width="134dp"
-        android:layout_height="106dp"
-        android:id="@+id/imageView"/>
-
-</LinearLayout>
+</FrameLayout>
