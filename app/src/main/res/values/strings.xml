@@ -10,4 +10,9 @@
     <string name="splash_text">Find Opportunities in Your Area!</string>
     <string name="redo_search">REDO SEARCH IN THIS AREA</string>
     <string name="transparent_warning">Many locations shown are approximations. Please contact the organization before travelling</string>
+    <string name="description">Description</string>
+    <string name="less">Show less</string>
+    <string name="more">Show more</string>
+    <string name="instagram">Photos from Instagram</string>
+    <string name="information">Information</string>
 </resources>

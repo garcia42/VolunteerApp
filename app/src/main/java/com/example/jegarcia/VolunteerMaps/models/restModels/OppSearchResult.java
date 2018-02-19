@@ -3,7 +3,7 @@ package com.example.jegarcia.VolunteerMaps.models.restModels;
 import com.example.jegarcia.VolunteerMaps.models.BaseObjectModel;
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class to represent the results returned from an API call to "searchOpportunities". This class is
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class OppSearchResult extends BaseObjectModel {
     private Integer currentPage;
-    private ArrayList<Opportunities> opportunities;
+    private List<Opportunities> opportunities;
     private Integer resultsSize;
     private String sortCriteria;
 
@@ -28,11 +28,11 @@ public class OppSearchResult extends BaseObjectModel {
         this.currentPage = currentPage;
     }
 
-    public ArrayList<Opportunities> getOpportunities() {
+    public List<Opportunities> getOpportunities() {
         return opportunities;
     }
 
-    public void setOpportunities(ArrayList<Opportunities> opportunities) {
+    public void setOpportunities(List<Opportunities> opportunities) {
         this.opportunities = opportunities;
     }
 

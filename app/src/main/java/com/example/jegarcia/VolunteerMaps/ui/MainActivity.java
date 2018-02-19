@@ -7,6 +7,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -21,7 +22,6 @@ import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
@@ -187,7 +187,14 @@ public class MainActivity extends AppCompatActivity {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
             city = RealmHelper.getCityFromPosition(this, longitude, latitude);
+            if (StringUtils.isEmpty(city)) {
+                city = "San Francisco";
+            }
             Log.d(TAG, "Location of user " + longitude + " " + latitude + " " + city);
+        } else {
+            latitude = 38.57179019;
+            longitude = -121.47857666;
+            city = "Sacramento";
         }
     }
 
@@ -305,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
             VolunteerMatchApiService.ConnectionInfo connectionInfo =
                     VolunteerMatchApiService.createConnectionInfo(wsse, apiUrl, restMethod, searchQuery, httpMethod);
             Cache cache = VolunteerApplication.getInstance().getRequestQueue().getCache();
-            if(cache.get(connectionInfo.url) == null) { // Redo if null, otherwise don't
+            if (cache.get(connectionInfo.url) == null) { // Redo if null, otherwise don't
                 // Cached response doesn't exists. Make network call here
                 createJsonObjectRequest(connectionInfo.url, connectionInfo.headers, location);
                 RecyclerViewFragment recyclerViewFragment = (RecyclerViewFragment) mVolunteerFragmentPagerAdapter.getFragment(1);
@@ -315,7 +322,10 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Log.d(TAG, "Cache Hit, No need to download");
                 RecyclerViewFragment recyclerViewFragment = (RecyclerViewFragment) mVolunteerFragmentPagerAdapter.getFragment(1);
-                if (recyclerViewFragment != null && VolunteerApplication.getInstance().getRequestsRemaining() == 0) { //Stop the scroll listener load
+//                if (recyclerViewFragment != null && VolunteerApplication.getInstance().getRequestsRemaining() == 0) { //Stop the scroll listener load
+//                    recyclerViewFragment.stopLoadingIcon();
+//                }
+                if (recyclerViewFragment != null) {
                     recyclerViewFragment.stopLoadingIcon();
                 }
             }
@@ -343,8 +353,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                         Log.d(TAG, "Finished searching for opportunities size: " + result.getOpportunities().size());
                         Log.d(TAG, "Finished searching for currentPage: " + result.getCurrentPage());
+                        if (isEmulator()) {
+                            for (Opportunities opp: result.getOpportunities()) {
+                                opp.setDescription(opp.getDescription() + opp.getDescription() + opp.getDescription());
+                            }
+                        }
                         saveOpportunitiesAndGetData(result.getOpportunities(), getBaseContext(), location);
                         VolunteerApplication.getInstance().decrementRequestsRemaining();
+
                     }
                 }, new Response.ErrorListener() {
 
@@ -371,6 +387,8 @@ public class MainActivity extends AppCompatActivity {
     private void saveOpportunitiesAndGetData(final List<Opportunities> opportunities, Context context, String location) {
         storeOpportunities(opportunities, context);
         storeExtraData(opportunities, context, location);
+        RecyclerViewFragment recyclerViewFragment = (RecyclerViewFragment) mVolunteerFragmentPagerAdapter.getFragment(1);
+        recyclerViewFragment.getAdapter().notifyDataSetChanged();
     }
 
     private void storeExtraData(final List<Opportunities> opportunities, final Context context, final String location) {
@@ -434,6 +452,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public static boolean isEmulator() {
+        return Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || "google_sdk".equals(Build.PRODUCT);
+    }
+
+
     private LatLng getLatLngFromZip(String zip, Context context) {
         final Geocoder geocoder = new Geocoder(context);
         try {
@@ -441,12 +471,10 @@ public class MainActivity extends AppCompatActivity {
             if (addresses != null && !addresses.isEmpty()) {
                 Address address = addresses.get(0);
                 return new LatLng(address.getLatitude(), address.getLongitude());
-            } else {
-                // Display appropriate message when Geocoder services are not available
-                Toast.makeText(context, "Unable to geocode zipcode", Toast.LENGTH_LONG).show();
             }
         } catch (IOException e) {
             // handle exception
+            Log.e(TAG, e.toString());
         }
         return null;
     }

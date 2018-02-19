@@ -3,6 +3,7 @@ package com.example.jegarcia.VolunteerMaps.ui;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
@@ -14,6 +15,8 @@ import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+
+import static android.content.ContentValues.TAG;
 
 class RealmHelper {
 
@@ -57,12 +60,15 @@ class RealmHelper {
         try {
             List<Address> address = geoCoder.getFromLocation(latitude, longitude, 1);
             builder.append(address.get(0).getLocality());
-        } catch (IOException e) {
-
-        } catch (NullPointerException e) {
-
+        } catch (Exception e) {
+            Log.d(TAG, "No Address Found to get city from");
+            return null;
         }
-        return builder.toString();
+        String city = builder.toString();
+        if (city.toLowerCase().trim().equals("null")) {
+            return null;
+        }
+        return city;
     }
 
     public static boolean hasOpportunitiesNearby(double latitude, double longitude) {

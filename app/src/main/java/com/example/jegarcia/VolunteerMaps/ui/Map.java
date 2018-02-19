@@ -38,6 +38,8 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
+import org.apache.axis.utils.StringUtils;
+
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -236,7 +238,8 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
                         while (opportunityLocations.contains(latLng)) {
                             latLng = moveNearbyRandomly(latLng);
                         }
-                        VolunteerClusterItem offsetItem = new VolunteerClusterItem(opportunity.getOppId(), latLng.latitude, latLng.longitude, opportunity.getTitle(), "");
+                        VolunteerClusterItem offsetItem =
+                                new VolunteerClusterItem(opportunity.getOppId(), latLng.latitude, latLng.longitude, opportunity.getTitle(), opportunity.getParentOrg().getName());
                         mClusterManager.addItem(offsetItem);
                         opportunityIds.add(opportunity.getOppId());
                         opportunityLocations.add(latLng);
@@ -293,7 +296,6 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
         if (mLocationPermissionGranted) {
             mLastKnownLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
-
         }
 
         //Should just save map config in map state manager, not in saved instance state.
@@ -341,12 +343,16 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
                                     double longitude = mMap.getCameraPosition().target.longitude;
                                     String city = RealmHelper.getCityFromPosition(getContext(), longitude, latitude);
                                     //TODO might want to keep calling until 20 more in db
-                                    Log.d(TAG, "Redo Search in city: " + city);
-                                    ((MainActivity) getActivity()).invokeTaskFragment(0, daysSince, getContext(), city);
-                                    ((MainActivity) getActivity()).invokeTaskFragment(1, daysSince, getContext(), city);
-                                    mRedoSearch.setOnClickListener(null);
-                                    mRedoSearch.setVisibility(View.GONE);
-                                    Toast.makeText(getContext(), "Searching in " + city, Toast.LENGTH_LONG).show();
+                                    if (!StringUtils.isEmpty(city)) {
+                                        Log.d(TAG, "Redo Search in city: " + city);
+                                        ((MainActivity) getActivity()).invokeTaskFragment(0, daysSince, getContext(), city);
+                                        ((MainActivity) getActivity()).invokeTaskFragment(1, daysSince, getContext(), city);
+                                        mRedoSearch.setOnClickListener(null);
+                                        mRedoSearch.setVisibility(View.GONE);
+                                        Toast.makeText(getContext(), "Searching in " + city, Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(getContext(), "No city found in this area", Toast.LENGTH_LONG).show();
+                                    }
                                 }
                             });
                         }

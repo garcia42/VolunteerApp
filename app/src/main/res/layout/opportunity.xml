@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical"
+    android:background="@color/clouds"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android" >
     
@@ -15,23 +16,50 @@
         android:elevation="10dp"
         android:background="#424de4">
 
-        <ImageButton
-            android:layout_gravity="start|center_vertical"
-            android:id="@+id/closeOpportunity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_clear_white_24dp"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="match_parent">
 
-        <com.varunest.sparkbutton.SparkButton
-            android:layout_gravity="end"
-            android:id="@+id/star_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:sparkbutton_activeImage="@drawable/heart_on"
-            app:sparkbutton_iconSize="30dp"
-            app:sparkbutton_inActiveImage="@drawable/heart_off"
-            app:sparkbutton_primaryColor="@color/colorPrimary"
-            app:sparkbutton_secondaryColor="@color/spark_secondary_color" />
+            <ImageButton
+                android:layout_margin="8dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:id="@+id/closeOpportunity"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_clear_white_24dp"/>
+
+            <TextView
+                android:visibility="gone"
+                android:layout_toRightOf="@id/closeOpportunity"
+                android:layout_toEndOf="@id/closeOpportunity"
+                android:id="@+id/oppNameTitleBar"
+                android:text="Reading Partners"
+                android:layout_centerVertical="true"
+                android:textColor="#ffffff"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                />
+
+            <com.varunest.sparkbutton.SparkButton
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:id="@+id/star_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:sparkbutton_activeImage="@drawable/heart_on"
+                app:sparkbutton_iconSize="30dp"
+                app:sparkbutton_inActiveImage="@drawable/heart_off"
+                app:sparkbutton_primaryColor="@color/colorPrimary"
+                app:sparkbutton_secondaryColor="@color/spark_secondary_color" />
+
+        </RelativeLayout>
     </FrameLayout>
 
     <ScrollView
@@ -39,48 +67,58 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:paddingTop="12dp"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
+                android:background="#ffffff"
                 android:id="@+id/opportunityName"
                 android:text="Activity Name"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textStyle="bold"
                 android:textSize="22sp"
-                android:padding="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp"
                 android:textColor="#000000"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <LinearLayout
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
+            <RelativeLayout
+                android:background="@color/white"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#bab8b8"            />
+                android:paddingBottom="8dp"
+                android:layout_height="180dp">
 
-            <ImageView
-                android:layout_gravity="center"
-                android:src="@drawable/rsz_volunteer"
-                android:layout_width="190dp"
-                android:layout_height="130dp"
-                android:layout_margin="8dp"
-                android:id="@+id/imageView"/>
+                <ImageView
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/rsz_volunteer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="160dp"
+                    android:minWidth="160dp"
+                    android:id="@+id/imageView"/>
+            </RelativeLayout>
+
+            <TextView
+                android:padding="8dp"
+                android:layout_marginTop="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/information"
+                android:textSize="16sp"
+                android:textColor="@color/black"/>
 
             <!--Place-->
             <RelativeLayout
+                android:background="#ffffff"
                 android:id="@+id/placeRelativeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:paddingTop="8dp"
-                android:paddingBottom="8dp">
+                android:paddingBottom="4dp">
 
                 <ImageView
                     android:id="@+id/placeImageView"
@@ -93,38 +131,37 @@
                     android:layout_toRightOf="@id/placeImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingLeft="4dp"
                     android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/placeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="4dp"
-                        android:text="Frye Art Museum" />
+                        android:text="Sacramento" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/address"
-                        android:paddingLeft="4dp"
                         android:text="Address"/>
 
                     <TextView
                         android:id="@+id/zipCode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="4dp"
                         android:text="Zip Code" />
                 </LinearLayout>
             </RelativeLayout>
 
             <!--Host-->
             <RelativeLayout
+                android:background="#ffffff"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
                 android:id="@+id/hostRelativeLayout">
                 <ImageView
                     android:id="@+id/hostImageView"
@@ -145,10 +182,11 @@
 
             <!--Time-->
             <RelativeLayout
+                android:background="#ffffff"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:paddingTop="8dp"
+                android:paddingTop="4dp"
                 android:paddingBottom="8dp"
                 android:id="@+id/timeRelativeLayout">
                 <ImageView
@@ -162,7 +200,9 @@
                     android:text="Saturday, November 11"
                     android:textColor="#29961b"
                     android:paddingLeft="4dp"
+                    android:paddingStart="4dp"
                     android:layout_toRightOf="@id/timeImageView"
+                    android:layout_toEndOf="@id/timeImageView"
                     android:layout_centerVertical="true"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content">
@@ -170,21 +210,60 @@
             </RelativeLayout>
 
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
+            <TextView
+                android:padding="8dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
-                android:background="#bab8b8"
-                />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/description"
+                android:textSize="16sp"
+                android:textColor="@color/black"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp">
+                <com.example.jegarcia.VolunteerMaps.ui.views.ExpandableTextView
+                    android:background="@color/white"
+                    android:id="@+id/description"
+                    android:padding="8dp"
+                    android:text="This is the description box. This is the description box. This is the description box. This is the description box. This is the description box. This is the description box. This is the description box. This is the description box. This is the description box."
+                    android:layout_width="match_parent"
+                    android:ellipsize="end"
+                    android:maxLines="8"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:paddingLeft="8dp"
+                    android:id="@+id/readMoreTextView"
+                    android:background="@color/white"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Read more"
+                    android:visibility="gone"
+                    android:textColor="@color/peterRiver"/>
+
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/description"
-                android:padding="8dp"
-                android:text="This is the description box. This is the description box. This is the description box. This is the description box. This is the description box. This is the description box. This is the description box. This is the description box. This is the description box."
+                android:id="@+id/instagramDescription"
+                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
+                android:paddingBottom="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:text="@string/instagram"
+                android:textSize="16sp"
+                android:textColor="@color/black"/>
+
+
+            <android.support.v7.widget.RecyclerView
+                android:background="@color/white"
+                android:id="@+id/instagramList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-
         </LinearLayout>
 
     </ScrollView>
