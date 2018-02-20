@@ -31,7 +31,7 @@
         android:name="com.example.jegarcia.VolunteerMaps.VolunteerApplication"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.example.jegarcia.VolunteerMaps.ui.MainActivity"
+            android:name="com.example.jegarcia.VolunteerMaps.ui.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -48,7 +48,7 @@
         </activity>
 
         <activity
-            android:name="com.example.jegarcia.VolunteerMaps.ui.OpportunityActivity"
+            android:name="com.example.jegarcia.VolunteerMaps.ui.activity.OpportunityActivity"
             android:label="Description"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>

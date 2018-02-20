@@ -1,4 +1,4 @@
-package com.example.jegarcia.VolunteerMaps.ui;
+package com.example.jegarcia.VolunteerMaps.ui.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +21,11 @@ import android.widget.Toast;
 
 import com.example.jegarcia.VolunteerMaps.R;
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
+import com.example.jegarcia.VolunteerMaps.ui.activity.MainActivity;
+import com.example.jegarcia.VolunteerMaps.ui.MapStateManager;
+import com.example.jegarcia.VolunteerMaps.ui.activity.OpportunityActivity;
+import com.example.jegarcia.VolunteerMaps.ui.RealmHelper;
+import com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerMatchApiService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -50,7 +55,7 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
-import static com.example.jegarcia.VolunteerMaps.ui.VolunteerRequestUtils.daysSince;
+import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.daysSince;
 
 public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -345,8 +350,7 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
                                     //TODO might want to keep calling until 20 more in db
                                     if (!StringUtils.isEmpty(city)) {
                                         Log.d(TAG, "Redo Search in city: " + city);
-                                        ((MainActivity) getActivity()).invokeTaskFragment(0, daysSince, getContext(), city);
-                                        ((MainActivity) getActivity()).invokeTaskFragment(1, daysSince, getContext(), city);
+                                        VolunteerMatchApiService.downloadAllOppsInArea(0, daysSince, getContext(), city);
                                         mRedoSearch.setOnClickListener(null);
                                         mRedoSearch.setVisibility(View.GONE);
                                         Toast.makeText(getContext(), "Searching in " + city, Toast.LENGTH_LONG).show();

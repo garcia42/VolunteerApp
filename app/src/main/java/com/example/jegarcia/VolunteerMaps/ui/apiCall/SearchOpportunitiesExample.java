@@ -1,4 +1,4 @@
-package com.example.jegarcia.VolunteerMaps.ui;
+package com.example.jegarcia.VolunteerMaps.ui.apiCall;
 
 import android.util.Log;
 
@@ -13,7 +13,7 @@ import org.apache.axis.utils.StringUtils;
 
 import java.util.ArrayList;
 
-import static com.example.jegarcia.VolunteerMaps.ui.VolunteerRequestUtils.formatDate;
+import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.formatDate;
 
 /**
  * Simple command line example of how one can call the VolunteerMatch public API to retrieve a list of opportunities.
@@ -49,7 +49,7 @@ public class SearchOpportunitiesExample {
 //        dr.setSingleDayOpps(true);
         dr.setStartDate(formatDate(0)); // Maybe always stay on today? defaults to today? check
         dr.setEndDate(formatDate(-daysSince));
-        oq.setUpdatedSince("2015-04-05T00:00:00Z");
+        oq.setUpdatedSince("2015-04-05T00:00:00Z"); //TODO OH MY GOD!!!!
         dateRanges.add(dr);
         dr = new OppSearchQuery.DateRange();
         dr.setOngoing(true);
@@ -62,10 +62,10 @@ public class SearchOpportunitiesExample {
         ArrayList<String> displayFields = new ArrayList<>();
         displayFields.add("id");
         displayFields.add("title");
+        displayFields.add("imageUrl");
         displayFields.add("updated");
         displayFields.add("status");
         displayFields.add("availability");
-        displayFields.add("imageUrl");
         displayFields.add("contact");
         displayFields.add("volunteersNeeded");
         displayFields.add("skillsNeeded");

@@ -1,4 +1,4 @@
-package com.example.jegarcia.VolunteerMaps.ui;
+package com.example.jegarcia.VolunteerMaps.ui.fragment;
 /*
 * Copyright (C) 2014 The Android Open Source Project
 *
@@ -33,6 +33,9 @@ import android.widget.TextView;
 
 import com.example.jegarcia.VolunteerMaps.R;
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
+import com.example.jegarcia.VolunteerMaps.ui.RealmHelper;
+import com.example.jegarcia.VolunteerMaps.ui.activity.MainActivity;
+import com.example.jegarcia.VolunteerMaps.ui.activity.OpportunityActivity;
 import com.example.jegarcia.VolunteerMaps.ui.volunteerMatchRecyclerView.EndlessRecyclerViewScrollListener;
 import com.example.jegarcia.VolunteerMaps.ui.volunteerMatchRecyclerView.RecyclerViewClickListener;
 import com.example.jegarcia.VolunteerMaps.ui.volunteerMatchRecyclerView.SearchResultAdapter;
@@ -40,11 +43,10 @@ import com.example.jegarcia.VolunteerMaps.ui.volunteerMatchRecyclerView.SearchRe
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-import static com.example.jegarcia.VolunteerMaps.ui.VolunteerRequestUtils.IS_SAVED;
-import static com.example.jegarcia.VolunteerMaps.ui.VolunteerRequestUtils.LATITUDE;
-import static com.example.jegarcia.VolunteerMaps.ui.VolunteerRequestUtils.LOCATION;
-import static com.example.jegarcia.VolunteerMaps.ui.VolunteerRequestUtils.LONGITUDE;
-import static com.example.jegarcia.VolunteerMaps.ui.VolunteerRequestUtils.daysSince;
+import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.IS_SAVED;
+import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.LATITUDE;
+import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.LOCATION;
+import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.LONGITUDE;
 
 /**
  * Demonstrates the use of {@link RecyclerView} with a {@link LinearLayoutManager} and a
@@ -66,7 +68,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
 
     public void stopLoadingIcon() {
         if (loadingLayout == null && getActivity() != null) {
-            loadingLayout = (LinearLayout) getActivity().findViewById(R.id.loadingLayout);
+            loadingLayout = getActivity().findViewById(R.id.loadingLayout);
         }
         if (loadingLayout != null) {
             loadingLayout.setVisibility(View.GONE);
@@ -78,7 +80,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
 
     public void showLoadingIcon() {
         if (loadingLayout == null && getActivity() != null) {
-            loadingLayout = (LinearLayout) getActivity().findViewById(R.id.loadingLayout);
+            loadingLayout = getActivity().findViewById(R.id.loadingLayout);
         }
         if (loadingLayout != null) {
             loadingLayout.setVisibility(View.VISIBLE);
@@ -121,11 +123,6 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
             longitude = bundle.getDouble(LONGITUDE, 0);
             isSaved = bundle.getBoolean(IS_SAVED, false);
         }
-        MainActivity activity = (MainActivity) getActivity();
-        if (!RealmHelper.hasOpportunitiesNearby(latitude, longitude)) { //Only do this on initialization
-            Log.d(TAG, "No Opportunities, download page 0");
-            activity.invokeTaskFragment(0, daysSince, getContext(), location);
-        }
     }
 
     @Override
@@ -136,24 +133,20 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
         rootView.setTag(TAG);
         Log.d(TAG, "RecyclerViewFragment onCreateView");
 
-        loadingLayout = (LinearLayout) rootView.findViewById(R.id.loadingLayout);
+        loadingLayout = rootView.findViewById(R.id.loadingLayout);
         if (!RealmHelper.hasOpportunitiesNearby(latitude, longitude)) {
             if (!isSaved) {
                 Log.d(TAG, "Show Loading Layout");
                 loadingLayout.setVisibility(View.VISIBLE);
             }
         }
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.opportunitiesView);
-        emptyListTextView = (TextView) rootView.findViewById(R.id.emptyListTextView);
-        // LinearLayoutManager is used here, this will layout the elements in a similar fashion
-        // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
-        // elements are laid out.
+        mRecyclerView = rootView.findViewById(R.id.opportunitiesView);
+        emptyListTextView = rootView.findViewById(R.id.emptyListTextView);
         mLayoutManager = new LinearLayoutManager(getActivity());
 
         mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
 
         if (savedInstanceState != null) {
-            // Restore saved layout manager type.
             mCurrentLayoutManagerType = (LayoutManagerType) savedInstanceState
                     .getSerializable(KEY_LAYOUT_MANAGER);
         }
@@ -163,7 +156,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
 //        RealmResults<Opportunities> opportunitiesRealmResults = realm
 //                .where(Opportunities.class).contains("location.downloadedCity", location, Case.INSENSITIVE).findAllAsync();
         double box = RealmHelper.getBoundingLimits();
-        RealmResults<Opportunities> opportunitiesRealmResults = null;
+        RealmResults<Opportunities> opportunitiesRealmResults;
         if (!isSaved) {
             opportunitiesRealmResults = realm
                     .where(Opportunities.class)
@@ -176,7 +169,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
                 @Override
                 public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                     Log.d(TAG, "Loading More: Page " + page + " Total Count: " + totalItemsCount);
-                    ((MainActivity) getActivity()).invokeTaskFragment(page, daysSince, getContext(), location);
+//                    VolunteerMatchApiService.downloadAllOppsInArea(page, daysSince, getContext(), location);
                 }
             };
             mRecyclerView.addOnScrollListener(mScrollListener);
@@ -198,7 +191,6 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save currently selected layout manager.
         savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -214,11 +206,6 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
         }
     }
 
-    /**
-     * Set RecyclerView's LayoutManager to the one given.
-     *
-     * @param layoutManagerType Type of layout manager to switch to.
-     */
     public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
         int scrollPosition = 0;
 

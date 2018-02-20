@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
+import com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
@@ -18,9 +19,9 @@ import io.realm.RealmResults;
 
 import static android.content.ContentValues.TAG;
 
-class RealmHelper {
+public class RealmHelper {
 
-    static void removeOldEvents(Context context) {
+    public static void removeOldEvents(Context context) {
         Realm realmConfig = Realm.getDefaultInstance();
 //        Realm realmConfig = ((MainActivity) context).getRealm();
         realmConfig.executeTransactionAsync(new Realm.Transaction() {

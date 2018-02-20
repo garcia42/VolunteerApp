@@ -1,4 +1,4 @@
-package com.example.jegarcia.VolunteerMaps.ui;
+package com.example.jegarcia.VolunteerMaps.ui.views;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

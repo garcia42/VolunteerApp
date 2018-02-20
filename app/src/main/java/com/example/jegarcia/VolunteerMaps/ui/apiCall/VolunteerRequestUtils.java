@@ -1,4 +1,4 @@
-package com.example.jegarcia.VolunteerMaps.ui;
+package com.example.jegarcia.VolunteerMaps.ui.apiCall;
 
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
 
@@ -46,7 +46,7 @@ public class VolunteerRequestUtils {
         return dateAndTimeFormat.format(updatedSince);
     }
 
-    static boolean isExpiredOpportunity(Opportunities opportunity) {
+    public static boolean isExpiredOpportunity(Opportunities opportunity) {
         if (opportunity.getAvailability() != null) {
             String endDateString = opportunity.getAvailability().getEndDate();
             String startDateString = opportunity.getAvailability().getStartDate();

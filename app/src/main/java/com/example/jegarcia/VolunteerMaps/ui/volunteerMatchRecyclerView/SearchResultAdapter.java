@@ -48,7 +48,7 @@ public class SearchResultAdapter extends RealmRecyclerViewAdapter<Opportunities,
         public TextView emptyListText;
         public LoadingViewHolder(View itemView) {
             super(itemView);
-            emptyListText = (TextView) itemView.findViewById(R.id.emptyListTextView);
+            emptyListText = itemView.findViewById(R.id.emptyListTextView);
         }
     }
 
@@ -63,11 +63,11 @@ public class SearchResultAdapter extends RealmRecyclerViewAdapter<Opportunities,
         OpportunitiesViewHolder(View itemView, RecyclerViewClickListener listener) {
             super(itemView);
             mListener = listener;
-            this.title = (TextView) itemView.findViewById(R.id.titleView);
-            this.image = (ImageView) itemView.findViewById(R.id.imageView);
-            this.parentOrg = (TextView) itemView.findViewById(R.id.parentOrg);
-            this.oppDay = (TextView) itemView.findViewById(R.id.oppDay);
-            this.likeButton = (SparkButton) itemView.findViewById(R.id.star_button);
+            this.title = itemView.findViewById(R.id.titleView);
+            this.image = itemView.findViewById(R.id.imageView);
+            this.parentOrg = itemView.findViewById(R.id.parentOrg);
+            this.oppDay = itemView.findViewById(R.id.oppDay);
+            this.likeButton = itemView.findViewById(R.id.star_button);
             itemView.setOnClickListener(this);
         }
 

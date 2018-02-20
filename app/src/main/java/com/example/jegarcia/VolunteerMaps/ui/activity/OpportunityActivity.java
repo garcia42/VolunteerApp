@@ -1,4 +1,4 @@
-package com.example.jegarcia.VolunteerMaps.ui;
+package com.example.jegarcia.VolunteerMaps.ui.activity;
 
 import android.app.Activity;
 import android.os.Build;
@@ -47,7 +47,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 import static android.view.View.GONE;
-import static com.example.jegarcia.VolunteerMaps.ui.SearchOpportunitiesExample.SEARCH_OPPORTUNITIES;
+import static com.example.jegarcia.VolunteerMaps.ui.apiCall.SearchOpportunitiesExample.SEARCH_OPPORTUNITIES;
 
 public class OpportunityActivity extends Activity {
 
