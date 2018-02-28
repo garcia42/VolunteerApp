@@ -2,16 +2,17 @@ package com.example.jegarcia.VolunteerMaps.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,13 +24,12 @@ import android.view.ViewGroup;
 import com.example.jegarcia.VolunteerMaps.R;
 import com.example.jegarcia.VolunteerMaps.ui.RealmHelper;
 import com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerMatchApiService;
+import com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils;
 import com.example.jegarcia.VolunteerMaps.ui.fragment.Map;
 import com.example.jegarcia.VolunteerMaps.ui.fragment.RecyclerViewFragment;
 
 import org.apache.axis.utils.StringUtils;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -41,8 +41,8 @@ import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtil
 
 public class MainActivity extends AppCompatActivity {
 
-    @BindView(R.id.tabLayout)
-        TabLayout tabLayout;
+//    @BindView(R.id.tabLayout)
+//        TabLayout tabLayout;
 
     RecyclerViewFragment volunteerListFragment;
     private RealmConfiguration realmConfiguration;
@@ -57,11 +57,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        setContentView(R.layout.framelayout);
+//        ButterKnife.bind(this);
         Log.d(TAG, "MainActivity onCreate");
 
-        realm = Realm.getDefaultInstance();
+        realm = getRealm();
         RealmHelper.removeOldEvents(this); //TODO do this less frequently
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -71,8 +71,10 @@ public class MainActivity extends AppCompatActivity {
             LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             Location location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             getLocation(locManager, location);
-            setupViewPager();
         }
+//            setupViewPager();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.map_frame, new Map()).commit();
     }
 
     private class VolunteerFragmentPagerAdapter extends FragmentPagerAdapter {
@@ -189,19 +191,19 @@ public class MainActivity extends AppCompatActivity {
                 } catch (SecurityException e) {
                     Log.e(TAG, "Permission For Location Not Granted");
                 }
-                setupViewPager();
+//                setupViewPager();
             }
         }
     }
 
-    private void setupViewPager() {
-        VolunteerFragmentPagerAdapter mVolunteerFragmentPagerAdapter = new VolunteerFragmentPagerAdapter(
-                getSupportFragmentManager());
-        ViewPager mViewPager = findViewById(R.id.pager);
-        mViewPager.setAdapter(mVolunteerFragmentPagerAdapter);
-        mViewPager.setOffscreenPageLimit(2); //For all three tabs
-        tabLayout.setupWithViewPager(mViewPager);
-    }
+//    private void setupViewPager() {
+//        VolunteerFragmentPagerAdapter mVolunteerFragmentPagerAdapter = new VolunteerFragmentPagerAdapter(
+//                getSupportFragmentManager());
+//        ViewPager mViewPager = findViewById(R.id.pager);
+//        mViewPager.setAdapter(mVolunteerFragmentPagerAdapter);
+//        mViewPager.setOffscreenPageLimit(2); //For all three tabs
+//        tabLayout.setupWithViewPager(mViewPager);
+//    }
 
     public void showRecyclerViewLoadingIcon() {
         ViewPager mViewPager = findViewById(R.id.pager);
@@ -255,7 +257,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.close();
+        if (realm != null) {
+            realm.close();
+        }
+        realm = null;
     }
 
     public RealmConfiguration getRealmConfig() {

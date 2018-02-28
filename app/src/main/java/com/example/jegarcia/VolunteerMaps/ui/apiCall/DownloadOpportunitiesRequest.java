@@ -1,21 +1,24 @@
 package com.example.jegarcia.VolunteerMaps.ui.apiCall;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.jegarcia.VolunteerMaps.VolunteerApplication;
+import com.example.jegarcia.VolunteerMaps.R;
 import com.example.jegarcia.VolunteerMaps.models.restModels.OppSearchResult;
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
-import com.example.jegarcia.VolunteerMaps.ui.activity.MainActivity;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerMatchApiService.saveOpportunitiesAndGetData;
@@ -23,40 +26,60 @@ import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerMatchApiSer
 public class DownloadOpportunitiesRequest extends JsonObjectRequest {
 
     private static final String TAG = DownloadOpportunitiesRequest.class.getSimpleName();
+    private static final String PREFS_NAME = "volunteerPrefsConfig";
+
     private Map<String, String> mHeaders;
+    private String mLocation;
+    private Context mContext;
+    private final Gson gson;
 
-    public DownloadOpportunitiesRequest(int method, String url, Map<String, String> headers, final Context context, final String location) {
-        super(method, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        OppSearchResult result = SearchOpportunitiesExample.parseResult(response.toString());
-                        if (!isResultOk(result)) {
-                            return;
-                        }
-                        if (result.getCurrentPage() == 1 || result.getCurrentPage() == 0) {
-                            VolunteerMatchApiService.enqueueOtherPages(result, context, location);
-                        }
-                        if (isEmulator()) {
-                            for (Opportunities opp : result.getOpportunities()) {
-                                opp.setDescription(opp.getDescription() + opp.getDescription() + opp.getDescription());
-                            }
-                        }
-                        saveOpportunitiesAndGetData(result.getOpportunities(), context, location);
-                        VolunteerApplication.getInstance().decrementRequestsRemaining();
-                    }
-
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        VolleyLog.e(TAG, "Error: " + error.getMessage());
-                        if (context instanceof MainActivity) {
-                            ((MainActivity) context).hideRecyclerViewLoadingIcon();
-                        }
-                    }
-                });
+    public DownloadOpportunitiesRequest(int method, String url, Map<String, String> headers, final Context context, final String location, Gson gson) {
+        super(method, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+            }
+        });
         this.mHeaders = headers;
+        this.mLocation = location;
+        this.mContext = context;
+        this.gson = gson;
+    }
+
+    @Override
+    protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+        String json = null;
+        try {
+            json = new String(response.data,
+                    HttpHeaderParser.parseCharset(response.headers));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        OppSearchResult result = gson.fromJson(json, OppSearchResult.class);
+
+        if (result.getCurrentPage() == result.getResultsSize() / 20) { //TODO math might be off
+            SharedPreferences.Editor editor = mContext.getSharedPreferences(PREFS_NAME, 0).edit();
+            String key = mContext.getString(R.string.last_check_date) + mLocation;
+            editor.putString(key, VolunteerRequestUtils.formatDateAndTime(0)).apply();
+        }
+
+//        OppSearchResult result = SearchOpportunitiesExample.parseResult(response.toString());
+        if (!isResultOk(result)) {
+            return Response.error(new VolleyError(response));
+        }
+        if (result.getCurrentPage() == 1 || result.getCurrentPage() == 0) {
+            VolunteerMatchApiService.enqueueOtherPages(result, mContext, mLocation);
+        }
+        if (isEmulator()) {
+            for (Opportunities opp : result.getOpportunities()) {
+                opp.setDescription(opp.getDescription() + opp.getDescription() + opp.getDescription());
+            }
+        }
+        saveOpportunitiesAndGetData(result.getOpportunities(), mContext, mLocation);
+        return super.parseNetworkResponse(response);
     }
 
     private static boolean isEmulator() {

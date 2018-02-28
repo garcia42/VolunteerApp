@@ -19,7 +19,6 @@ public class VolunteerApplication extends Application {
 
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
-    private int requestsRemaining = 0;
 
     private static VolunteerApplication mInstance;
 
@@ -69,28 +68,17 @@ public class VolunteerApplication extends Application {
         // set the default tag if tag is empty
         req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
         getRequestQueue().add(req);
-        requestsRemaining++;
         Log.d(TAG, "Added REST request to queue");
-    }
-
-    public int getRequestsRemaining() {
-        return requestsRemaining;
-    }
-
-    public void decrementRequestsRemaining() {
-        requestsRemaining--;
     }
 
     public <T> void addToRequestQueue(Request<T> req) {
         req.setTag(TAG);
         getRequestQueue().add(req);
-        requestsRemaining++;
     }
 
     public void cancelPendingRequests(Object tag) {
         if (mRequestQueue != null) {
             mRequestQueue.cancelAll(tag);
-            requestsRemaining = 0;
         }
     }
 }

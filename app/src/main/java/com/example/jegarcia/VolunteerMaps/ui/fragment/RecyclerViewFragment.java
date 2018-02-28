@@ -128,7 +128,7 @@ public class RecyclerViewFragment extends Fragment implements RecyclerViewClickL
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.content_main, container, false);
+        View rootView = inflater.inflate(R.layout.recyclerview, container, false);
 //        ButterKnife.bind(this, rootView);
         rootView.setTag(TAG);
         Log.d(TAG, "RecyclerViewFragment onCreateView");

@@ -4,13 +4,10 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
 import com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils;
-import com.google.android.gms.maps.model.LatLng;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -22,37 +19,20 @@ import static android.content.ContentValues.TAG;
 public class RealmHelper {
 
     public static void removeOldEvents(Context context) {
-        Realm realmConfig = Realm.getDefaultInstance();
-//        Realm realmConfig = ((MainActivity) context).getRealm();
-        realmConfig.executeTransactionAsync(new Realm.Transaction() {
+        try (Realm realmConfig = Realm.getDefaultInstance()) {
+            realmConfig.executeTransactionAsync(new Realm.Transaction() {
 
-            @Override
-            public void execute(Realm realm) {
-                RealmResults<Opportunities> opportunities = realm.where(Opportunities.class).findAll();
-                for (Opportunities opportunity : opportunities) {
-                    if (VolunteerRequestUtils.isExpiredOpportunity(opportunity)) {
-                        opportunity.deleteFromRealm();
+                @Override
+                public void execute(Realm realm) {
+                    RealmResults<Opportunities> opportunities = realm.where(Opportunities.class).findAll();
+                    for (Opportunities opportunity : opportunities) {
+                        if (VolunteerRequestUtils.isExpiredOpportunity(opportunity)) {
+                            opportunity.deleteFromRealm();
+                        }
                     }
                 }
-            }
-        });
-    }
-
-    private static LatLng getLatLngFromZip(String zip, Context context) {
-        final Geocoder geocoder = new Geocoder(context);
-        try {
-            List<Address> addresses = geocoder.getFromLocationName(zip, 1);
-            if (addresses != null && !addresses.isEmpty()) {
-                Address address = addresses.get(0);
-                return new LatLng(address.getLatitude(), address.getLongitude());
-            } else {
-                // Display appropriate message when Geocoder services are not available
-                Toast.makeText(context, "Unable to geocode zipcode", Toast.LENGTH_LONG).show();
-            }
-        } catch (IOException e) {
-            // handle exception
+            });
         }
-        return null;
     }
 
     public static String getCityFromPosition(Context context, double longitude, double latitude) {

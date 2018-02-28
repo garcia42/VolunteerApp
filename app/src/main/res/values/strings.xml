@@ -15,4 +15,6 @@
     <string name="more">Show more</string>
     <string name="instagram">Photos from Instagram</string>
     <string name="information">Information</string>
+    <string name="ongoing_efforts">Ongoing Volunteering Efforts</string>
+    <string name="last_check_date">LAST_UPDATED_VOLUNTEER_DATE</string>
 </resources>

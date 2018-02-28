@@ -1,11 +1,6 @@
 package com.example.jegarcia.VolunteerMaps.ui.apiCall;
 
-import android.util.Log;
-
 import com.example.jegarcia.VolunteerMaps.models.restModels.OppSearchQuery;
-import com.example.jegarcia.VolunteerMaps.models.restModels.OppSearchResult;
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -43,13 +38,13 @@ public class SearchOpportunitiesExample {
         }
         OppSearchQuery oq = new OppSearchQuery();
         oq.setLocation(location);
-        oq.setRadius("city");//TODO maybe this could expand?
+        oq.setRadius("city");
         ArrayList<OppSearchQuery.DateRange> dateRanges = new ArrayList<>();
         OppSearchQuery.DateRange dr = new OppSearchQuery.DateRange();
 //        dr.setSingleDayOpps(true);
         dr.setStartDate(formatDate(0)); // Maybe always stay on today? defaults to today? check
         dr.setEndDate(formatDate(-daysSince));
-        oq.setUpdatedSince("2015-04-05T00:00:00Z"); //TODO OH MY GOD!!!!
+        oq.setUpdatedSince(updatedSince);
         dateRanges.add(dr);
         dr = new OppSearchQuery.DateRange();
         dr.setOngoing(true);
@@ -62,50 +57,51 @@ public class SearchOpportunitiesExample {
         ArrayList<String> displayFields = new ArrayList<>();
         displayFields.add("id");
         displayFields.add("title");
-        displayFields.add("imageUrl");
-        displayFields.add("updated");
-        displayFields.add("status");
-        displayFields.add("availability");
-        displayFields.add("contact");
-        displayFields.add("volunteersNeeded");
-        displayFields.add("skillsNeeded");
-        displayFields.add("greatFor");
-        displayFields.add("spacesAvailable");
-        displayFields.add("keywords");
+        displayFields.add("location");
+//        displayFields.add("imageUrl");
+//        displayFields.add("updated");
+//        displayFields.add("status");
+//        displayFields.add("availability");
+//        displayFields.add("contact");
+//        displayFields.add("volunteersNeeded");
+//        displayFields.add("skillsNeeded");
+//        displayFields.add("greatFor");
+//        displayFields.add("spacesAvailable");
+//        displayFields.add("keywords");
         oq.setFieldsToDisplay(displayFields);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(oq);
     }
 
-    static OppSearchResult parseResult(String result) {
-        OppSearchResult reportResult = null;
-        if(result != null) {
-            String resultArray[] = result.split("\n");
-            try {
-                Gson gson = new GsonBuilder()
-                        .serializeNulls()
-                        .disableHtmlEscaping()
-                        .addDeserializationExclusionStrategy(new ExclusionStrategy() {
-                            @Override
-                            public boolean shouldSkipField(FieldAttributes f) {
-                                return f.getName().contains("downloadTime") || f.getName().contains("downloadedCity") || f.getName().contains("isLiked");
-                            }
-
-                            @Override
-                            public boolean shouldSkipClass(Class<?> aClass) {
-                                return false;
-                            }
-                        })
-                        .create();
-                reportResult = gson.fromJson(resultArray[0], OppSearchResult.class);
-            } catch (Exception jbe) {
-                System.out.println("Error decoding json result: " + jbe);
-                Log.e(TAG, "Results:" + resultArray.toString());
-                jbe.printStackTrace();
-            }
-        } else {
-            System.out.println("Error calling " + SEARCH_OPPORTUNITIES + " API.");
-        }
-        return reportResult;
-    }
+//    static OppSearchResult parseResult(String result) {
+//        OppSearchResult reportResult = null;
+//        if(result != null) {
+//            String resultArray[] = result.split("\n");
+//            try {
+//                Gson gson = new GsonBuilder()
+//                        .serializeNulls()
+//                        .disableHtmlEscaping()
+//                        .addDeserializationExclusionStrategy(new ExclusionStrategy() {
+//                            @Override
+//                            public boolean shouldSkipField(FieldAttributes f) {
+//                                return f.getName().contains("downloadTime") || f.getName().contains("downloadedCity") || f.getName().contains("isLiked");
+//                            }
+//
+//                            @Override
+//                            public boolean shouldSkipClass(Class<?> aClass) {
+//                                return false;
+//                            }
+//                        })
+//                        .create();
+//                reportResult = gson.fromJson(resultArray[0], OppSearchResult.class);
+//            } catch (Exception jbe) {
+//                System.out.println("Error decoding json result: " + jbe);
+//                Log.e(TAG, "Results:" + Arrays.toString(resultArray));
+//                jbe.printStackTrace();
+//            }
+//        } else {
+//            System.out.println("Error calling " + SEARCH_OPPORTUNITIES + " API.");
+//        }
+//        return reportResult;
+//    }
 }

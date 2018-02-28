@@ -347,7 +347,6 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
                                     double latitude = mMap.getCameraPosition().target.latitude;
                                     double longitude = mMap.getCameraPosition().target.longitude;
                                     String city = RealmHelper.getCityFromPosition(getContext(), longitude, latitude);
-                                    //TODO might want to keep calling until 20 more in db
                                     if (!StringUtils.isEmpty(city)) {
                                         Log.d(TAG, "Redo Search in city: " + city);
                                         VolunteerMatchApiService.downloadAllOppsInArea(0, daysSince, getContext(), city);

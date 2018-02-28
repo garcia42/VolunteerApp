@@ -2,18 +2,20 @@ package com.example.jegarcia.VolunteerMaps.ui.apiCall;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.volley.Request;
+import com.example.jegarcia.VolunteerMaps.R;
 import com.example.jegarcia.VolunteerMaps.VolunteerApplication;
 import com.example.jegarcia.VolunteerMaps.models.restModels.OppSearchResult;
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.GeoLocation;
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
-import com.example.jegarcia.VolunteerMaps.ui.activity.MainActivity;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 
 import org.apache.axis.encoding.Base64;
 import org.apache.axis.utils.StringUtils;
@@ -32,7 +34,6 @@ import java.util.List;
 import io.realm.Realm;
 
 import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.daysSince;
-import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.formatDateAndTime;
 
 public class VolunteerMatchApiService {
 
@@ -45,6 +46,9 @@ public class VolunteerMatchApiService {
 
     private static final String HTTP_METHOD_GET = "GET";
     private static final String TAG = VolunteerMatchApiService.class.getName();
+    private static final String PREFS_NAME = "volunteerPrefsConfig";
+
+    private static Gson gson;
 
     private static byte[] generateNonce() {
         try {
@@ -119,12 +123,16 @@ public class VolunteerMatchApiService {
     }
 
     public static void downloadAllOppsInArea(int pageNumber, int daysSince, Context context, String location) {
-        String updatedSince = formatDateAndTime(daysSince);
+        SharedPreferences editor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String key = context.getString(R.string.last_check_date) + location; //Takes into account location
+        if (!editor.contains(key)) {
+            editor.edit().putString(key, VolunteerRequestUtils.formatDateAndTime(15)).apply();
+        }
+        String updatedSince = editor.getString(String.valueOf(R.string.last_check_date), "2015-04-05T00:00:00Z");
         String searchOppsQuery = SearchOpportunitiesExample.buildSearchOppsQuery(pageNumber, updatedSince, daysSince, location);
         String tag_json_obj = "json_obj_req";
-        VolunteerMatchApiService.WSSECredentials wsse = null;
         try {
-            wsse = buildWSSECredentials(ACCOUNT_NAME, PASSWORD);
+            VolunteerMatchApiService.WSSECredentials wsse = buildWSSECredentials(ACCOUNT_NAME, PASSWORD);
             VolunteerMatchApiService.ConnectionInfo connectionInfo =
                     VolunteerMatchApiService.createConnectionInfo(wsse, apiUrl, SearchOpportunitiesExample.SEARCH_OPPORTUNITIES, searchOppsQuery, HTTP_METHOD_GET);
             createJsonObjectRequest(connectionInfo.url, connectionInfo.headers, location, context);
@@ -135,12 +143,19 @@ public class VolunteerMatchApiService {
     }
 
     private static void createJsonObjectRequest(final String url, final HashMap<String, String> headers, final String location, final Context context) {
-        if (context instanceof MainActivity) {
-            ((MainActivity) context).showRecyclerViewLoadingIcon();
-        }
-        DownloadOpportunitiesRequest jsonObjReq = new DownloadOpportunitiesRequest(Request.Method.GET, url, headers, context, location);
+//        if (context instanceof MainActivity) {
+//            ((MainActivity) context).showRecyclerViewLoadingIcon();
+//        }
+        DownloadOpportunitiesRequest jsonObjReq = new DownloadOpportunitiesRequest(Request.Method.GET, url, headers, context, location, getGson());
         // Adding request to request queue
         VolunteerApplication.getInstance().addToRequestQueue(jsonObjReq, "");
+    }
+
+    private static Gson getGson() {
+        if (gson == null) {
+            gson = new Gson();
+        }
+        return gson;
     }
 
     static void enqueueOtherPages(OppSearchResult result, Context context, String location) {
@@ -167,62 +182,53 @@ public class VolunteerMatchApiService {
     static void saveOpportunitiesAndGetData(final List<Opportunities> opportunities, Context context, String location) {
         storeOpportunities(opportunities);
         storeExtraData(opportunities, context, location);
-        //TODO is this necessary?
-//        RecyclerViewFragment recyclerViewFragment = (RecyclerViewFragment) mVolunteerFragmentPagerAdapter.getFragment(1);
-//        recyclerViewFragment.getAdapter().notifyDataSetChanged();
     }
 
     private static void storeExtraData(final List<Opportunities> opportunities, final Context context, final String location) {
-        Realm realmConfig = Realm.getDefaultInstance();
-        realmConfig.executeTransactionAsync(new Realm.Transaction() {
+        try (Realm realmConfig = Realm.getDefaultInstance()) {
+            realmConfig.executeTransaction(new Realm.Transaction() {
 
-            @Override
-            public void execute(@NonNull Realm realm) {
-                for (Opportunities opportunity : opportunities) {
-                    String zip = opportunity.getLocation().getPostalCode();
-                    LatLng zipLocation = getLatLngFromZip(zip, context);
-                    if (zipLocation != null && opportunity.getLocation().getGeoLocation() == null) { //Geo location
-                        opportunity.getLocation().setGeoLocation(new GeoLocation());
-                        opportunity.getLocation().getGeoLocation().setLatitude(zipLocation.latitude);
-                        opportunity.getLocation().getGeoLocation().setLongitude(zipLocation.longitude);
+                @Override
+                public void execute(@NonNull Realm realm) {
+                    for (Opportunities opportunity : opportunities) {
+                        String zip = opportunity.getLocation().getPostalCode();
+                        LatLng zipLocation = getLatLngFromZip(zip, context);
+                        if (zipLocation != null && opportunity.getLocation().getGeoLocation() == null) { //Geo location
+                            opportunity.getLocation().setGeoLocation(new GeoLocation());
+                            opportunity.getLocation().getGeoLocation().setLatitude(zipLocation.latitude);
+                            opportunity.getLocation().getGeoLocation().setLongitude(zipLocation.longitude);
 //                        opportunity.getLocation().getGeoLocation().setLongitude(Double.valueOf(zipLocation.longitude).longValue());
+                        }
+                        if (StringUtils.isEmpty(opportunity.getAvailability().getStartDate()) &&
+                                StringUtils.isEmpty(opportunity.getAvailability().getEndDate())) { //End Date
+                            opportunity.getAvailability().setEndDate(VolunteerRequestUtils.formatDate(-7));
+                        }
                     }
-                    if (StringUtils.isEmpty(opportunity.getAvailability().getStartDate()) &&
-                            StringUtils.isEmpty(opportunity.getAvailability().getEndDate())) { //End Date
-                        opportunity.getAvailability().setEndDate(VolunteerRequestUtils.formatDate(-7));
-                    }
+                    realm.copyToRealmOrUpdate(opportunities);
                 }
-                realm.copyToRealmOrUpdate(opportunities);
-            }
-        }, new Realm.Transaction.OnSuccess() {
-
-            @Override
-            public void onSuccess() {
-//                if (context instanceof MainActivity) {
-//                    ((MainActivity) context).hideRecyclerViewLoadingIcon();
-//                }
-            }
-        });
+            });
+        }
     }
 
     private static void storeOpportunities(final List<Opportunities> opportunities) {
-        Realm realmConfig = Realm.getDefaultInstance();
-        realmConfig.executeTransactionAsync(new Realm.Transaction() {
+        try (Realm realmConfig = Realm.getDefaultInstance()) {
+            realmConfig.executeTransaction(new Realm.Transaction() {
 
-            @Override
-            public void execute(@NonNull Realm realm) {
-                for (Opportunities opportunity : opportunities) {
-                    Opportunities user = realm.where(Opportunities.class).equalTo("id", opportunity.getOppId()).findFirst();
-                    //Current Opportunity doesn't have an updated value and the one in the db exists but doesn't have an updated date either
-                    if (user == null || StringUtils.isEmpty(user.getUpdated())) {
-                        if (StringUtils.isEmpty(opportunity.getUpdated())) {
-                            opportunity.setUpdated(VolunteerRequestUtils.formatDate(0)); //Today
+                @Override
+                public void execute(@NonNull Realm realm) {
+                    for (Opportunities opportunity : opportunities) {
+                        Opportunities user = realm.where(Opportunities.class).equalTo("id", opportunity.getOppId()).findFirst();
+                        //Current Opportunity doesn't have an updated value and the one in the db exists but doesn't have an updated date either
+                        if (user == null || StringUtils.isEmpty(user.getUpdated())) {
+                            if (StringUtils.isEmpty(opportunity.getUpdated())) {
+                                opportunity.setUpdated(VolunteerRequestUtils.formatDate(0)); //Today
+                            }
                         }
                     }
+                    realm.copyToRealmOrUpdate(opportunities);
                 }
-                realm.copyToRealmOrUpdate(opportunities);
-            }
-        });
+            });
+        }
     }
 
     private static LatLng getLatLngFromZip(String zip, Context context) {

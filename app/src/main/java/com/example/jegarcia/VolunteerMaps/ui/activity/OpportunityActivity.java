@@ -44,7 +44,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 import static android.view.View.GONE;
 import static com.example.jegarcia.VolunteerMaps.ui.apiCall.SearchOpportunitiesExample.SEARCH_OPPORTUNITIES;
@@ -93,14 +92,23 @@ public class OpportunityActivity extends Activity {
     @BindView(R.id.instagramDescription)
     TextView instagramDescription;
 
-    private int mOpportunityId;
-    private boolean trim = true;
-
     private static final String TAG = OpportunityActivity.class.getSimpleName();
     public static final String CLIENT_ID = "bcbeab07a3fe4cabb3c3cac0a084e896";
     public static final String CLIENT_SECRET = "8efd5ec6ecae40a080264b2865210b3c";
     public static final String CALLBACK_URL = "redirect uri here";
     public static final String ACCESS_TOKEN = "6902294237.ba4c844.21071e2ccf9e4a14a305b650b02db40d";
+
+    private int mOpportunityId;
+    private String mImageUrl;
+    private String mParentOrgName;
+    private String mStartDate;
+    private String mEndDate;
+    private String mPostalCode;
+    private String mAddress;
+    private String mCity;
+    private String mDescription;
+    private boolean mIsLiked;
+    private String mTitle;
 
 //    https://api.instagram.com/v1/locations/{location-id}/media/recent?access_token=ACCESS-TOKEN
 
@@ -119,148 +127,146 @@ public class OpportunityActivity extends Activity {
     }
 
     private void setupOpportunityViews() {
-        Realm realm = null;
-        try {
+        try (Realm realm = Realm.getDefaultInstance()) {
             // Get a Realm instance for this thread
-            realm = Realm.getDefaultInstance();
 
-            realm.executeTransaction(new Realm.Transaction() {
-
+            realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    final RealmResults<Opportunities> opportunities = realm.where(Opportunities.class).equalTo("id", mOpportunityId).findAll();
-                    for (Opportunities opportunity : opportunities) { // YES
-                        final int oppId = opportunity.getOppId();
-                        if (StringUtils.isEmpty(opportunity.getAvailability().getStartDate())) {
-                            timeTextView.setText("Ongoing Volunteering Efforts");
-                        } else {
-                            try {
-                                StringBuilder dateText = new StringBuilder();
-                                java.util.Date date = new SimpleDateFormat("yyyy-MM-dd").parse(opportunity.getAvailability().getStartDate());
-                                dateText.append(new SimpleDateFormat("EEEE, MMMM d yyyy").format(date));
-                                if (!StringUtils.isEmpty(opportunity.getAvailability().getStartDate()) &&
-                                        !opportunity.getAvailability().getStartDate().equals(opportunity.getAvailability().getEndDate())) {
-                                    date = new SimpleDateFormat("yyyy-MM-dd").parse(opportunity.getAvailability().getEndDate());
-                                    dateText.append(" - ");
-                                    dateText.append(new SimpleDateFormat("EEEE, MMMM d yyyy").format(date));
-                                }
-                                timeTextView.setText(dateText.toString());
-                            } catch (ParseException e) {
-                                timeTextView.setText(opportunity.getAvailability().getStartDate());
-                                e.printStackTrace();
-                            }
-
-                            opportunity.getAvailability().getStartDate();
-                            opportunity.getAvailability().getEndDate();
-                            String.valueOf(opportunity.getAvailability());
-                        }
-
-                        if (StringUtils.isEmpty(opportunity.getLocation().getPostalCode())) {
-                            zip.setVisibility(GONE);
-                        } else {
-                            zip.setText(opportunity.getLocation().getPostalCode());
-                        }
-
-                        if (StringUtils.isEmpty(opportunity.getLocation().getAddress())) {
-                            address.setVisibility(GONE);
-                        } else {
-                            address.setText(opportunity.getLocation().getAddress());
-                        }
-
-                        if (StringUtils.isEmpty(opportunity.getLocation().getCity())) {
-                            location.setVisibility(GONE);
-                        } else {
-                            location.setText(opportunity.getLocation().getCity());
-                        }
-                        parentOrg.setText(String.valueOf(opportunity.getParentOrg().getName()));
-
-                        if (Build.VERSION.SDK_INT >= 24)
-                        {
-                            description.setText(Html.fromHtml(opportunity.getDescription() , Html.FROM_HTML_MODE_LEGACY));
-                        }
-                        else
-                        {
-                            description.setText(Html.fromHtml(opportunity.getDescription()));
-                        }
-                        Linkify.addLinks(description, Linkify.ALL);
-                        description.setMovementMethod(LinkMovementMethod.getInstance());
-                        description.addEllipsizeListener(new ExpandableTextView.EllipsizeListener() {
-                            @Override
-                            public void ellipsizeStateChanged(boolean ellipsized) {
-                                if (ellipsized) {
-                                    readMore.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        });
-                        readMore.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (description.isEllipsized()) {
-                                    description.setMaxLines(1000);
-                                    readMore.setText(R.string.less);
-                                } else {
-                                    description.setMaxLines(8);
-                                    readMore.setText(R.string.more);
-                                }
-                            }
-                        });
-
-                        oppNameTitleBar.setText(String.valueOf(opportunity.getTitle()));
-                        opportunityName.setText(String.valueOf(opportunity.getTitle()));
-
-                        if (!StringUtils.isEmpty(opportunity.getImageUrl())) {
-                            String decodedUrl = URLDecoder.decode(opportunity.getImageUrl());
-                            Picasso.with(getBaseContext()).load(decodedUrl).into(imageView);
-                        }
-
-                        startVolleyRequest(opportunity.getParentOrg().getName(), ACCESS_TOKEN);
-
-                        sparkButton.setChecked(opportunity.isLiked());
-                        sparkButton.setEventListener(new SparkEventListener(){
-                            @Override
-                            public void onEvent(ImageView imageView, boolean b) {
-                                Realm realm = Realm.getDefaultInstance();
-                                if (b) {
-                                    realm.executeTransactionAsync(new Realm.Transaction() {
-
-                                        @Override
-                                        public void execute(Realm realm) {
-                                            Opportunities modifyOpp = realm.where(Opportunities.class).equalTo("id", oppId).findFirst();
-                                            if (modifyOpp != null) {
-                                                modifyOpp.setLiked(true);
-                                            }
-                                        }
-                                    });
-                                } else {
-                                    realm.executeTransaction(new Realm.Transaction() {
-                                        @Override
-                                        public void execute(Realm realm) {
-                                            Opportunities modifyOpp = realm.where(Opportunities.class).equalTo("id", oppId).findFirst();
-                                            if (modifyOpp != null) {
-                                                modifyOpp.setLiked(false);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-
-                            @Override
-                            public void onEventAnimationEnd(ImageView imageView, boolean b) {
-
-                            }
-
-                            @Override
-                            public void onEventAnimationStart(ImageView imageView, boolean b) {
-
-                            }
-                        });
+                    Opportunities opportunity = realm.where(Opportunities.class).equalTo("id", mOpportunityId).findFirst();
+                    if (opportunity != null) {
+                        mImageUrl = opportunity.getImageUrl();
+                        mParentOrgName = opportunity.getParentOrg().getName();
+                        mStartDate = opportunity.getAvailability().getStartDate();
+                        mEndDate = opportunity.getAvailability().getEndDate();
+                        mPostalCode = opportunity.getLocation().getPostalCode();
+                        mAddress = opportunity.getLocation().getAddress();
+                        mCity = opportunity.getLocation().getAddress();
+                        mDescription = opportunity.getDescription();
+                        mIsLiked = opportunity.isLiked();
+                        mTitle = opportunity.getTitle();
                     }
                 }
+            }, new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+                    if (!StringUtils.isEmpty(mImageUrl)) {
+                        String decodedUrl = URLDecoder.decode(mImageUrl);
+                        Picasso.with(getBaseContext()).load(decodedUrl).into(imageView);
+                    }
+                    startVolleyRequest(mParentOrgName, ACCESS_TOKEN);
+
+                    if (StringUtils.isEmpty(mStartDate)) {
+                        timeTextView.setText(R.string.ongoing_efforts);
+                    } else {
+                        try {
+                            StringBuilder dateText = new StringBuilder();
+                            java.util.Date date = new SimpleDateFormat("yyyy-MM-dd").parse(mStartDate);
+                            dateText.append(new SimpleDateFormat("EEEE, MMMM d yyyy").format(date));
+                            if (!StringUtils.isEmpty(mStartDate) && !mStartDate.equals(mEndDate)) {
+                                date = new SimpleDateFormat("yyyy-MM-dd").parse(mEndDate);
+                                dateText.append(" - ");
+                                dateText.append(new SimpleDateFormat("EEEE, MMMM d yyyy").format(date));
+                            }
+                            timeTextView.setText(dateText.toString());
+                        } catch (ParseException e) {
+                            timeTextView.setText(mStartDate);
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (StringUtils.isEmpty(mPostalCode)) {
+                        zip.setVisibility(GONE);
+                    } else {
+                        zip.setText(mPostalCode);
+                    }
+
+                    if (StringUtils.isEmpty(mAddress)) {
+                        address.setVisibility(GONE);
+                    } else {
+                        address.setText(mAddress);
+                    }
+
+                    if (StringUtils.isEmpty(mCity)) {
+                        location.setVisibility(GONE);
+                    } else {
+                        location.setText(mCity);
+                    }
+                    parentOrg.setText(String.valueOf(mParentOrgName));
+
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        description.setText(Html.fromHtml(mDescription, Html.FROM_HTML_MODE_LEGACY));
+                    } else {
+                        description.setText(Html.fromHtml(mDescription));
+                    }
+                    Linkify.addLinks(description, Linkify.ALL);
+                    description.setMovementMethod(LinkMovementMethod.getInstance());
+                    description.addEllipsizeListener(new ExpandableTextView.EllipsizeListener() {
+                        @Override
+                        public void ellipsizeStateChanged(boolean ellipsized) {
+                            if (ellipsized) {
+                                readMore.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
+                    readMore.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (description.isEllipsized()) {
+                                description.setMaxLines(1000);
+                                readMore.setText(R.string.less);
+                            } else {
+                                description.setMaxLines(8);
+                                readMore.setText(R.string.more);
+                            }
+                        }
+                    });
+
+                    oppNameTitleBar.setText(String.valueOf(mTitle));
+                    opportunityName.setText(String.valueOf(mTitle));
+
+                    sparkButton.setChecked(mIsLiked);
+                    sparkButton.setEventListener(new SparkEventListener() {
+                        @Override
+                        public void onEvent(ImageView imageView, boolean b) {
+                            Realm realm = Realm.getDefaultInstance();
+                            if (b) {
+                                realm.executeTransactionAsync(new Realm.Transaction() {
+
+                                    @Override
+                                    public void execute(Realm realm) {
+                                        Opportunities modifyOpp = realm.where(Opportunities.class).equalTo("id", mOpportunityId).findFirst();
+                                        if (modifyOpp != null) {
+                                            modifyOpp.setLiked(true);
+                                        }
+                                    }
+                                });
+                            } else {
+                                realm.executeTransaction(new Realm.Transaction() {
+                                    @Override
+                                    public void execute(Realm realm) {
+                                        Opportunities modifyOpp = realm.where(Opportunities.class).equalTo("id", mOpportunityId).findFirst();
+                                        if (modifyOpp != null) {
+                                            modifyOpp.setLiked(false);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onEventAnimationEnd(ImageView imageView, boolean b) {
+
+                        }
+
+                        @Override
+                        public void onEventAnimationStart(ImageView imageView, boolean b) {
+
+                        }
+                    });
+
+                }
             });
-        } finally {
-            if (realm != null) {
-                realm.close();
-            }
         }
     }
 
@@ -293,7 +299,6 @@ public class OpportunityActivity extends Activity {
                     @Override
                     public void onResponse(JSONObject response) {
                         InstagramResponse instagramResponse = parseResult(response.toString());
-                        VolunteerApplication.getInstance().decrementRequestsRemaining();
                         if (instagramResponse.getData() != null && instagramResponse.getData().length != 0) { //Empty Check
                             instagramDescription.setVisibility(View.VISIBLE);
                             instagramResponse.setData(Arrays.copyOfRange(instagramResponse.getData(), 0, instagramResponse.getData().length > 6 ? 6 : instagramResponse.getData().length));
@@ -326,7 +331,7 @@ public class OpportunityActivity extends Activity {
                 reportResult = gson.fromJson(resultArray[0], InstagramResponse.class);
             } catch (Exception jbe) {
                 System.out.println("Error decoding json result: " + jbe);
-                Log.e(TAG, "Results:" + resultArray.toString());
+                Log.e(TAG, "Results:" + Arrays.toString(resultArray));
                 jbe.printStackTrace();
             }
         } else {
