@@ -55,14 +55,14 @@ public class Opportunities extends RealmObject {
     boolean isLiked;
 
     @JsonAdapter(StringRealmListConverter.class)
-    RealmList<String> keywords;
+    RealmList<RealmString> categoryIds;
 
-    public RealmList<String> getKeywords() {
-        return keywords;
+    public RealmList<RealmString> getCategoryIds() {
+        return categoryIds;
     }
 
-    public void setKeywords(RealmList<String> keywords) {
-        this.keywords = keywords;
+    public void setCategoryIds(RealmList<RealmString> keywords) {
+        this.categoryIds = keywords;
     }
 
     private Date downloadTime = new Date();

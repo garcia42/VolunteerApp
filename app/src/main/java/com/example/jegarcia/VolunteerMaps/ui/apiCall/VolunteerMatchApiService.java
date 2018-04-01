@@ -130,7 +130,6 @@ public class VolunteerMatchApiService {
         }
         String updatedSince = editor.getString(String.valueOf(R.string.last_check_date), "2015-04-05T00:00:00Z");
         String searchOppsQuery = SearchOpportunitiesExample.buildSearchOppsQuery(pageNumber, updatedSince, daysSince, location);
-        String tag_json_obj = "json_obj_req";
         try {
             VolunteerMatchApiService.WSSECredentials wsse = buildWSSECredentials(ACCOUNT_NAME, PASSWORD);
             VolunteerMatchApiService.ConnectionInfo connectionInfo =
@@ -143,9 +142,6 @@ public class VolunteerMatchApiService {
     }
 
     private static void createJsonObjectRequest(final String url, final HashMap<String, String> headers, final String location, final Context context) {
-//        if (context instanceof MainActivity) {
-//            ((MainActivity) context).showRecyclerViewLoadingIcon();
-//        }
         DownloadOpportunitiesRequest jsonObjReq = new DownloadOpportunitiesRequest(Request.Method.GET, url, headers, context, location, getGson());
         // Adding request to request queue
         VolunteerApplication.getInstance().addToRequestQueue(jsonObjReq, "");

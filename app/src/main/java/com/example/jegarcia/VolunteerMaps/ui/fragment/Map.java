@@ -21,11 +21,11 @@ import android.widget.Toast;
 
 import com.example.jegarcia.VolunteerMaps.R;
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
-import com.example.jegarcia.VolunteerMaps.ui.activity.MainActivity;
 import com.example.jegarcia.VolunteerMaps.ui.MapStateManager;
-import com.example.jegarcia.VolunteerMaps.ui.activity.OpportunityActivity;
 import com.example.jegarcia.VolunteerMaps.ui.RealmHelper;
-import com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerMatchApiService;
+import com.example.jegarcia.VolunteerMaps.ui.activity.MainActivity;
+import com.example.jegarcia.VolunteerMaps.ui.activity.OpportunityActivity;
+import com.example.jegarcia.VolunteerMaps.ui.apiCall.DownloadOpportunitiesService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -54,8 +54,6 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
-
-import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.daysSince;
 
 public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -91,20 +89,24 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
 
         // Build the Play services client for use by the Fused Location Provider and the Places API.
         // Use the addApi() method to request the Google Places API and the Fused Location Provider.
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .enableAutoManage(getActivity() /* FragmentActivity */,
-                        this /* OnConnectionFailedListener */)
-                .addConnectionCallbacks(this)
-                .addApi(LocationServices.API)
+        if (getActivity() != null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                    .enableAutoManage(getActivity() /* FragmentActivity */,
+                            this /* OnConnectionFailedListener */)
+                    .addConnectionCallbacks(this)
+                    .addApi(LocationServices.API)
 //                .addApi(Places.GEO_DATA_API)
 //                .addApi(Places.PLACE_DETECTION_API)
-                .build();
-        mGoogleApiClient.connect();
+                    .build();
+            mGoogleApiClient.connect();
+        }
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         Log.i(TAG, "Begin onCreateView MapFragment");
         View rootView = inflater.inflate(R.layout.map_layout, container, false);
         ButterKnife.bind(this, rootView);
@@ -114,7 +116,7 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
         mapView.onResume(); // needed to get the map to display immediately
 
         try {
-            MapsInitializer.initialize(getActivity().getApplicationContext());
+            MapsInitializer.initialize(getActivity());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -139,8 +141,8 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
     private void setUpClusterer() {
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
-        if (mClusterManager == null) {
-            mClusterManager = new ClusterManager<VolunteerClusterItem>(getContext(), mMap);
+        if (mClusterManager == null && getContext() != null) {
+            mClusterManager = new ClusterManager<> (getContext(), mMap);
             mClusterManager.setRenderer(new InfoMarkerRenderer(getContext(), mMap, mClusterManager));
         }
 
@@ -152,9 +154,13 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
         mClusterManager.setOnClusterItemInfoWindowClickListener(mClusterItemInfoWindowClickListener);
     }
 
+    public void updateCategoryId() {
+        loadOpportunitiesListener();
+    }
+
     public class InfoMarkerRenderer extends DefaultClusterRenderer<VolunteerClusterItem> {
 
-        public InfoMarkerRenderer(Context context, GoogleMap map, ClusterManager<VolunteerClusterItem> clusterManager) {
+        InfoMarkerRenderer(Context context, GoogleMap map, ClusterManager<VolunteerClusterItem> clusterManager) {
             super(context, map, clusterManager);
             //constructor
         }
@@ -203,7 +209,7 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         if (mMap != null) {
             MapStateManager msm = new MapStateManager(getContext());
             msm.saveMapState(mMap);
@@ -225,29 +231,31 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
         super.onStop();
     }
 
-    public void loadOpportunitiesListener(final GoogleMap googleMap) {
+    public void loadOpportunitiesListener() {
         Log.i(TAG, "Create Realm Listener for new map events");
         Realm realm = ((MainActivity) getActivity()).getRealm();
-
+        SharedPreferences pref = getActivity().getSharedPreferences("OPP_CATEGORY_ID", Context.MODE_PRIVATE);
+        final int categoryId = pref.getInt("categoryId", 0);
         opportunities = realm.where(Opportunities.class).findAllAsync();
 
         opportunities.addChangeListener(new RealmChangeListener<RealmResults<Opportunities>>() {
             @Override
-            public void onChange(RealmResults<Opportunities> opportunities) {
-//                googleMap.clear();
+            public void onChange(@NonNull RealmResults<Opportunities> opportunities) {
                 Log.d(TAG, "In Change Listener for Map Markers: isLoaded: " + opportunities.isLoaded() + " Size: " + opportunities.size());
                 for (Opportunities opportunity: opportunities) {
-                    if (opportunity.getLocation().getGeoLocation() != null && !opportunityIds.contains(opportunity.getOppId())) {
-                        LatLng latLng = new LatLng(opportunity.getLocation().getGeoLocation().getLatitude(),
-                                opportunity.getLocation().getGeoLocation().getLongitude());
-                        while (opportunityLocations.contains(latLng)) {
-                            latLng = moveNearbyRandomly(latLng);
+                    if (opportunity.getCategoryIds().contains(categoryId)) {
+                        if (opportunity.getLocation().getGeoLocation() != null && !opportunityIds.contains(opportunity.getOppId())) {
+                            LatLng latLng = new LatLng(opportunity.getLocation().getGeoLocation().getLatitude(),
+                                    opportunity.getLocation().getGeoLocation().getLongitude());
+                            while (opportunityLocations.contains(latLng)) {
+                                latLng = moveNearbyRandomly(latLng);
+                            }
+                            VolunteerClusterItem offsetItem =
+                                    new VolunteerClusterItem(opportunity.getOppId(), latLng.latitude, latLng.longitude, opportunity.getTitle(), opportunity.getParentOrg().getName());
+                            mClusterManager.addItem(offsetItem);
+                            opportunityIds.add(opportunity.getOppId());
+                            opportunityLocations.add(latLng);
                         }
-                        VolunteerClusterItem offsetItem =
-                                new VolunteerClusterItem(opportunity.getOppId(), latLng.latitude, latLng.longitude, opportunity.getTitle(), opportunity.getParentOrg().getName());
-                        mClusterManager.addItem(offsetItem);
-                        opportunityIds.add(opportunity.getOppId());
-                        opportunityLocations.add(latLng);
                     }
                 }
                 Log.d(TAG, "Refreshing Cluster Manager");
@@ -282,7 +290,11 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
 
     private void getDeviceLocation() {
         Log.i(TAG, "Updating map Location, getDeviceLocation");
-        if (ContextCompat.checkSelfPermission(getContext(),
+        Context context = getActivity();
+        if (context == null) {
+            return;
+        }
+        if (ContextCompat.checkSelfPermission(getActivity(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
@@ -291,7 +303,7 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
-        MapStateManager msm = new MapStateManager(getContext());
+        MapStateManager msm = new MapStateManager(getActivity());
         /*
      * Before getting the device location, you must check location
      * permission, as described earlier in the tutorial. Then:
@@ -322,6 +334,12 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
         }
     }
 
+    private Intent prepareIntent(String city) {
+        Intent localIntent = new Intent(getActivity(), DownloadOpportunitiesService.class);
+        localIntent.putExtra("location", city);
+        return localIntent;
+    }
+
     /**
      * Builds the map when the Google Play services client is successfully connected.
      */
@@ -329,9 +347,9 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
     public void onConnected(Bundle connectionHint) {
         // Get the current location of the device and set the position of the map.
         //Create markers for opportunities
-        if (mMap != null) {
+        if (mMap != null && getContext() != null) {
             setUpClusterer();
-            loadOpportunitiesListener(mMap);
+            loadOpportunitiesListener();
             mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
                 @Override
                 public void onCameraIdle() {
@@ -349,7 +367,13 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
                                     String city = RealmHelper.getCityFromPosition(getContext(), longitude, latitude);
                                     if (!StringUtils.isEmpty(city)) {
                                         Log.d(TAG, "Redo Search in city: " + city);
-                                        VolunteerMatchApiService.downloadAllOppsInArea(0, daysSince, getContext(), city);
+                                        Context context = Map.this.getActivity();
+                                        if (context != null) {
+                                            context.startService(prepareIntent(city));
+                                            //VolunteerMatchApiService.downloadAllOppsInArea(0, daysSince, getContext(), city);
+                                        } else {
+                                            Log.e(TAG, "Failed to start search service in Map");
+                                        }
                                         mRedoSearch.setOnClickListener(null);
                                         mRedoSearch.setVisibility(View.GONE);
                                         Toast.makeText(getContext(), "Searching in " + city, Toast.LENGTH_LONG).show();
@@ -448,11 +472,7 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
         private String mSnippet;
         private int mTag;
 
-        public VolunteerClusterItem(double lat, double lng) {
-            mPosition = new LatLng(lat, lng);
-        }
-
-        public VolunteerClusterItem(int oppId, double lat, double lng, String title, String snippet) {
+        VolunteerClusterItem(int oppId, double lat, double lng, String title, String snippet) {
             mTag = oppId;
             mPosition = new LatLng(lat, lng);
             mTitle = title;

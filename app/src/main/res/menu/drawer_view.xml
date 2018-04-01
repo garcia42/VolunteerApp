@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/all_menu"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/all" />
+        <item
+            android:id="@+id/advocacy_menu"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/advocacy" />
+        <item
+            android:id="@+id/animals_menu"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/animals" />
+        <item
+            android:id="@+id/arts_menu"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/arts" />
+        <item
+            android:id="@+id/children_menu"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/children" />
+
+        <item
+            android:id="@+id/community_menu"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/community" />
+
+        <item
+            android:id="@+id/computers_menu"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/computers" />
+
+        <item
+            android:id="@+id/education_menu"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/education" />
+        <item
+            android:id="@+id/health_menu"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/health" />
+        <item
+            android:id="@+id/seniors_menu"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/seniors" />
+        <item
+            android:id="@+id/other_menu"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/other" />
+
+    </group>
+</menu>

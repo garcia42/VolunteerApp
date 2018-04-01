@@ -66,7 +66,6 @@ public class DownloadOpportunitiesRequest extends JsonObjectRequest {
             editor.putString(key, VolunteerRequestUtils.formatDateAndTime(0)).apply();
         }
 
-//        OppSearchResult result = SearchOpportunitiesExample.parseResult(response.toString());
         if (!isResultOk(result)) {
             return Response.error(new VolleyError(response));
         }

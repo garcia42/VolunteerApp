@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "jegarcia.semicharmed.VolunteerMaps"
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 7
         versionName "1.6"
         multiDexEnabled true
@@ -34,23 +34,23 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:26.0.0'
-    compile 'com.android.support:recyclerview-v7:26.0.0'
-    compile 'com.android.support:design:26.0.0'
-    compile 'com.google.code.gson:gson:2.7'
-    compile 'org.apache.axis:axis:1.4'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'org.apache.commons:commons-collections4:4.0'
-    compile 'com.google.android.gms:play-services-maps:11.0.4'
-    compile 'com.google.android.gms:play-services-location:11.0.4'
-    compile 'com.jakewharton:butterknife:8.5.1'
-    compile 'net.danlew:android.joda:2.9.9'
-    compile 'io.realm:android-adapters:2.0.0'
-    compile 'com.google.maps.android:android-maps-utils:0.5+'
-    compile 'com.android.volley:volley:1.0.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:27.0.0'
+    implementation 'com.android.support:recyclerview-v7:27.0.0'
+    implementation 'com.android.support:design:27.0.0'
+    implementation 'com.google.code.gson:gson:2.7'
+    implementation 'org.apache.axis:axis:1.4'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'org.apache.commons:commons-collections4:4.0'
+    implementation 'com.google.android.gms:play-services-maps:11.0.4'
+    implementation 'com.google.android.gms:play-services-location:11.0.4'
+    implementation 'com.jakewharton:butterknife:8.5.1'
+    implementation 'net.danlew:android.joda:2.9.9'
+    implementation 'io.realm:android-adapters:2.0.0'
+    implementation 'com.google.maps.android:android-maps-utils:0.5+'
+    implementation 'com.android.volley:volley:1.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-    compile 'com.github.jd-alexander:LikeButton:0.2.3'
-    compile 'com.github.varunest:sparkbutton:1.0.5'
+    implementation 'com.github.jd-alexander:LikeButton:0.2.3'
+    implementation 'com.github.varunest:sparkbutton:1.0.5'
 }

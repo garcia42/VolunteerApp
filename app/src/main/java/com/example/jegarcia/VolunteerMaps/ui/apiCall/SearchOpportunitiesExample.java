@@ -58,6 +58,7 @@ public class SearchOpportunitiesExample {
         displayFields.add("id");
         displayFields.add("title");
         displayFields.add("location");
+        displayFields.add("categoryIds");
 //        displayFields.add("imageUrl");
 //        displayFields.add("updated");
 //        displayFields.add("status");

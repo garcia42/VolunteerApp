@@ -8,49 +8,34 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 
 import com.example.jegarcia.VolunteerMaps.R;
 import com.example.jegarcia.VolunteerMaps.ui.RealmHelper;
-import com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerMatchApiService;
-import com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils;
+import com.example.jegarcia.VolunteerMaps.ui.apiCall.DownloadOpportunitiesService;
 import com.example.jegarcia.VolunteerMaps.ui.fragment.Map;
-import com.example.jegarcia.VolunteerMaps.ui.fragment.RecyclerViewFragment;
 
 import org.apache.axis.utils.StringUtils;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.IS_SAVED;
-import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.LATITUDE;
-import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.LOCATION;
-import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.LONGITUDE;
-import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerRequestUtils.daysSince;
-
 public class MainActivity extends AppCompatActivity {
 
-//    @BindView(R.id.tabLayout)
-//        TabLayout tabLayout;
-
-    RecyclerViewFragment volunteerListFragment;
     private RealmConfiguration realmConfiguration;
+    private DrawerLayout mDrawerLayout;
 
     private Realm realm;
-    private double longitude;
-    private double latitude;
-    private String city;
     private String TAG = MainActivity.class.getSimpleName();
     private int PERMISSIONS_RESULT_CODE = 113441235;
 
@@ -75,82 +60,72 @@ public class MainActivity extends AppCompatActivity {
 //            setupViewPager();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.map_frame, new Map()).commit();
+        setupNavigationDrawer();
     }
 
-    private class VolunteerFragmentPagerAdapter extends FragmentPagerAdapter {
-
-        private SparseArray<Fragment> fragments = new SparseArray<>();
-
-        VolunteerFragmentPagerAdapter(FragmentManager fm) {
-            super(fm);
+    private void setupNavigationDrawer() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) {
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         }
 
-        @Override
-        public Fragment getItem(int i) {
-
-            if (fragments.get(i) != null) {
-                return fragments.get(i);
-            }
-
-            Fragment fragment;
-            Bundle args = new Bundle();
-            switch (i) {
-                case 0:
-                    fragment = new Map();
-                    fragment.setArguments(args);
-                    return fragment;
-                case 1:
-                    fragment = new RecyclerViewFragment();
-                    volunteerListFragment = (RecyclerViewFragment) fragment;
-                    args.putString(LOCATION, city); // This needs current city
-                    args.putDouble(LATITUDE, latitude);
-                    args.putDouble(LONGITUDE, longitude);
-                    args.putBoolean(IS_SAVED, false);
-                    fragment.setArguments(args);
-                    return fragment;
-                case 2:
-                    fragment = new RecyclerViewFragment();
-                    args.putBoolean(IS_SAVED, true);
-                    fragment.setArguments(args);
-                    return fragment;
-            }
-            return null;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            Fragment fragment = (Fragment) super.instantiateItem(container, position);
-            fragments.put(position, fragment);
-            return fragment;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            fragments.remove(position);
-            super.destroyItem(container, position, object);
-        }
-
-        public Fragment getFragment(int position) {
-            return fragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return 3;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "Map";
-                case 1:
-                    return "List";
-                case 2:
-                    return "Saved";
-            }
-            return "Volunteer";
-        }
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
+                        SharedPreferences.Editor editor = getSharedPreferences("OPP_CATEGORY_ID", MODE_PRIVATE).edit();
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+                        switch(menuItem.getItemId()) {
+                            case R.id.all_menu:
+                                editor.putInt("categoryId", 0);
+                                break;
+                            case R.id.advocacy_menu:
+                                editor.putInt("categoryId", 23);
+                                break;
+                            case R.id.animals_menu:
+                                editor.putInt("categoryId", 30);
+                                break;
+                            case R.id.arts_menu:
+                                editor.putInt("categoryId", 34);
+                                break;
+                            case R.id.children_menu:
+                                editor.putInt("categoryId", 22);
+                                break;
+                            case R.id.community_menu:
+                                editor.putInt("categoryId", 25);
+                                break;
+                            case R.id.computers_menu:
+                                editor.putInt("categoryId", 37);
+                                break;
+                            case R.id.education_menu:
+                                editor.putInt("categoryId", 15);
+                                break;
+                            case R.id.health_menu:
+                                editor.putInt("categoryId", 11);
+                                break;
+                            case R.id.seniors_menu:
+                                editor.putInt("categoryId", 12);
+                                break;
+                            case R.id.other_menu:
+                                editor.putInt("categoryId", -1);
+                                break;
+                        }
+                        editor.apply();
+                        Map mapFragment = (Map) getSupportFragmentManager().findFragmentById(R.id.map_frame);
+                        mapFragment.updateCategoryId();
+                        return true;
+                    }
+                });
     }
 
     private void getLocation(LocationManager locManager, Location location) {
@@ -161,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "MainActivity network enabled");
         }
 
+        double longitude;
+        double latitude;
+        String city;
         if (location != null) {
             Log.d(TAG, "MainActivity location mananger getLastKnownLocation " + location.toString());
             longitude = location.getLongitude();
@@ -171,11 +149,16 @@ public class MainActivity extends AppCompatActivity {
             }
             Log.d(TAG, "Location of user " + longitude + " " + latitude + " " + city);
         } else {
-            latitude = 38.57179019;
-            longitude = -121.47857666;
             city = "Sacramento";
         }
-        VolunteerMatchApiService.downloadAllOppsInArea(0, daysSince, this, city);
+        startService(prepareIntent(city));
+//        VolunteerMatchApiService.downloadAllOppsInArea(0, daysSince, this, city);
+    }
+
+    private Intent prepareIntent(String city) {
+        Intent localIntent = new Intent(this, DownloadOpportunitiesService.class);
+        localIntent.putExtra("location", city);
+        return localIntent;
     }
 
     @Override
@@ -191,33 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (SecurityException e) {
                     Log.e(TAG, "Permission For Location Not Granted");
                 }
-//                setupViewPager();
             }
-        }
-    }
-
-//    private void setupViewPager() {
-//        VolunteerFragmentPagerAdapter mVolunteerFragmentPagerAdapter = new VolunteerFragmentPagerAdapter(
-//                getSupportFragmentManager());
-//        ViewPager mViewPager = findViewById(R.id.pager);
-//        mViewPager.setAdapter(mVolunteerFragmentPagerAdapter);
-//        mViewPager.setOffscreenPageLimit(2); //For all three tabs
-//        tabLayout.setupWithViewPager(mViewPager);
-//    }
-
-    public void showRecyclerViewLoadingIcon() {
-        ViewPager mViewPager = findViewById(R.id.pager);
-        VolunteerFragmentPagerAdapter adapter = (VolunteerFragmentPagerAdapter) mViewPager.getAdapter();
-        if (adapter != null) {
-            ((RecyclerViewFragment) adapter.getFragment(1)).showLoadingIcon();
-        }
-    }
-
-    public void hideRecyclerViewLoadingIcon() {
-        ViewPager mViewPager = findViewById(R.id.pager);
-        VolunteerFragmentPagerAdapter adapter = (VolunteerFragmentPagerAdapter) mViewPager.getAdapter();
-        if (adapter != null) {
-            ((RecyclerViewFragment) adapter.getFragment(1)).stopLoadingIcon();
         }
     }
 
@@ -242,10 +199,13 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

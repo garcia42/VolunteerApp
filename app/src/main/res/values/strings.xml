@@ -17,4 +17,16 @@
     <string name="information">Information</string>
     <string name="ongoing_efforts">Ongoing Volunteering Efforts</string>
     <string name="last_check_date">LAST_UPDATED_VOLUNTEER_DATE</string>
+    
+    <string name="all">All Opportunities</string>
+    <string name="advocacy">Advocacy &amp; Human Rights</string>
+    <string name="animals">Animals</string>
+    <string name="arts">Arts &amp; Culture</string>
+    <string name="children">Children &amp; Youth</string>
+    <string name="community">Community</string>
+    <string name="computers">Computers &amp; Technology</string>
+    <string name="education">Education &amp; Literacy</string>
+    <string name="health">Health &amp; Medicine</string>
+    <string name="seniors">Seniors</string>
+    <string name="other">Other</string>
 </resources>
