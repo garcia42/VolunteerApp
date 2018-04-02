@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Realm realm;
     private String TAG = MainActivity.class.getSimpleName();
     private int PERMISSIONS_RESULT_CODE = 113441235;
+    private int mCategoryId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,42 +88,42 @@ public class MainActivity extends AppCompatActivity {
                         // For example, swap UI fragments here
                         switch(menuItem.getItemId()) {
                             case R.id.all_menu:
-                                editor.putInt("categoryId", 0);
+                                mCategoryId = 0;
                                 break;
                             case R.id.advocacy_menu:
-                                editor.putInt("categoryId", 23);
+                                mCategoryId = 23;
                                 break;
                             case R.id.animals_menu:
-                                editor.putInt("categoryId", 30);
+                                mCategoryId = 30;
                                 break;
                             case R.id.arts_menu:
-                                editor.putInt("categoryId", 34);
+                                mCategoryId = 34;
                                 break;
                             case R.id.children_menu:
-                                editor.putInt("categoryId", 22);
+                                mCategoryId = 22;
                                 break;
                             case R.id.community_menu:
-                                editor.putInt("categoryId", 25);
+                                mCategoryId = 25;
                                 break;
                             case R.id.computers_menu:
-                                editor.putInt("categoryId", 37);
+                                mCategoryId = 37;
                                 break;
                             case R.id.education_menu:
-                                editor.putInt("categoryId", 15);
+                                mCategoryId = 15;
                                 break;
                             case R.id.health_menu:
-                                editor.putInt("categoryId", 11);
+                                mCategoryId = 11;
                                 break;
                             case R.id.seniors_menu:
-                                editor.putInt("categoryId", 12);
+                                mCategoryId = 12;
                                 break;
                             case R.id.other_menu:
-                                editor.putInt("categoryId", -1);
+                                mCategoryId = -1;
                                 break;
                         }
                         editor.apply();
                         Map mapFragment = (Map) getSupportFragmentManager().findFragmentById(R.id.map_frame);
-                        mapFragment.updateCategoryId();
+                        mapFragment.updateCategoryId(mCategoryId);
                         return true;
                     }
                 });
@@ -202,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         switch(id) {
             case R.id.action_settings:
                 return true;
-            case R.id.home:
+            case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
         }

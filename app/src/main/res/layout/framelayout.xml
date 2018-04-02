@@ -8,8 +8,13 @@
     android:fitsSystemWindows="true">
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/map_frame"
+        android:id="@+id/content_frame"
         android:layout_width="match_parent" android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/map_frame"/>
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -26,6 +31,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:menu="@menu/drawer_view"/>
+        app:menu="@menu/drawer_view"
+        app:headerLayout="@layout/drawer_header"/>
 
 </android.support.v4.widget.DrawerLayout>

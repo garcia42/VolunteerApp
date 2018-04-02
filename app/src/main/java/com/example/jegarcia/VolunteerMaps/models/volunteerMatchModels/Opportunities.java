@@ -1,5 +1,6 @@
 package com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels;
 
+import com.example.jegarcia.VolunteerMaps.models.ListToStringConverter;
 import com.example.jegarcia.VolunteerMaps.models.StringRealmListConverter;
 import com.google.gson.annotations.JsonAdapter;
 
@@ -54,14 +55,14 @@ public class Opportunities extends RealmObject {
 
     boolean isLiked;
 
-    @JsonAdapter(StringRealmListConverter.class)
-    RealmList<RealmString> categoryIds;
+    @JsonAdapter(ListToStringConverter.class)
+    String categoryIds;
 
-    public RealmList<RealmString> getCategoryIds() {
+    public String getCategoryIds() {
         return categoryIds;
     }
 
-    public void setCategoryIds(RealmList<RealmString> keywords) {
+    public void setCategoryIds(String keywords) {
         this.categoryIds = keywords;
     }
 

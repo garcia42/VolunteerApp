@@ -82,6 +82,7 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
 
     // Declare a variable for the cluster manager.
     private ClusterManager<VolunteerClusterItem> mClusterManager;
+    private int mCategoryId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -154,7 +155,8 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
         mClusterManager.setOnClusterItemInfoWindowClickListener(mClusterItemInfoWindowClickListener);
     }
 
-    public void updateCategoryId() {
+    public void updateCategoryId(int categoryId) {
+        mCategoryId = categoryId;
         loadOpportunitiesListener();
     }
 
@@ -234,16 +236,14 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
     public void loadOpportunitiesListener() {
         Log.i(TAG, "Create Realm Listener for new map events");
         Realm realm = ((MainActivity) getActivity()).getRealm();
-        SharedPreferences pref = getActivity().getSharedPreferences("OPP_CATEGORY_ID", Context.MODE_PRIVATE);
-        final int categoryId = pref.getInt("categoryId", 0);
         opportunities = realm.where(Opportunities.class).findAllAsync();
 
         opportunities.addChangeListener(new RealmChangeListener<RealmResults<Opportunities>>() {
             @Override
             public void onChange(@NonNull RealmResults<Opportunities> opportunities) {
-                Log.d(TAG, "In Change Listener for Map Markers: isLoaded: " + opportunities.isLoaded() + " Size: " + opportunities.size());
+                Log.i(TAG, "In Change Listener for Map Markers: isLoaded: " + opportunities.isLoaded() + " Size: " + opportunities.size());
                 for (Opportunities opportunity: opportunities) {
-                    if (opportunity.getCategoryIds().contains(categoryId)) {
+                    if (opportunity.getCategoryIds().contains("," + String.valueOf(mCategoryId) + ",") || mCategoryId == 0) {
                         if (opportunity.getLocation().getGeoLocation() != null && !opportunityIds.contains(opportunity.getOppId())) {
                             LatLng latLng = new LatLng(opportunity.getLocation().getGeoLocation().getLatitude(),
                                     opportunity.getLocation().getGeoLocation().getLongitude());
