@@ -67,7 +67,7 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
     @BindView(R.id.transparentPage)
     LinearLayout transparentPage;
 
-    private static final String TAG = Map.class.getName();
+    private static final String TAG = Map.class.getSimpleName() + "Jesus";
     private static final float DEFAULT_ZOOM = 11.0f;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private GoogleApiClient mGoogleApiClient;
@@ -108,7 +108,6 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Log.i(TAG, "Begin onCreateView MapFragment");
         View rootView = inflater.inflate(R.layout.map_layout, container, false);
         ButterKnife.bind(this, rootView);
 
@@ -236,29 +235,37 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
     public void loadOpportunitiesListener() {
         Log.i(TAG, "Create Realm Listener for new map events");
         Realm realm = ((MainActivity) getActivity()).getRealm();
-        opportunities = realm.where(Opportunities.class).findAllAsync();
-
+//        opportunities = realm.where(Opportunities.class).findAllAsync();
+        mClusterManager.clearItems();
+        opportunities = null;
+        opportunityIds.clear();
+        if (mCategoryId > -1) {
+            opportunities = realm.where(Opportunities.class).contains("categoryIds", "," + mCategoryId + ",").findAllAsync();
+        } else {
+            opportunities = realm.where(Opportunities.class).equalTo("isLiked", true).findAllAsync();
+        }
         opportunities.addChangeListener(new RealmChangeListener<RealmResults<Opportunities>>() {
             @Override
             public void onChange(@NonNull RealmResults<Opportunities> opportunities) {
                 Log.i(TAG, "In Change Listener for Map Markers: isLoaded: " + opportunities.isLoaded() + " Size: " + opportunities.size());
                 for (Opportunities opportunity: opportunities) {
-                    if (opportunity.getCategoryIds().contains("," + String.valueOf(mCategoryId) + ",") || mCategoryId == 0) {
-                        if (opportunity.getLocation().getGeoLocation() != null && !opportunityIds.contains(opportunity.getOppId())) {
-                            LatLng latLng = new LatLng(opportunity.getLocation().getGeoLocation().getLatitude(),
-                                    opportunity.getLocation().getGeoLocation().getLongitude());
-                            while (opportunityLocations.contains(latLng)) {
-                                latLng = moveNearbyRandomly(latLng);
-                            }
-                            VolunteerClusterItem offsetItem =
-                                    new VolunteerClusterItem(opportunity.getOppId(), latLng.latitude, latLng.longitude, opportunity.getTitle(), opportunity.getParentOrg().getName());
-                            mClusterManager.addItem(offsetItem);
-                            opportunityIds.add(opportunity.getOppId());
-                            opportunityLocations.add(latLng);
+                    boolean isSaved = opportunity.isLiked() && mCategoryId == -1;
+                    boolean categoryMatch = opportunity.getCategoryIds().contains(String.valueOf(mCategoryId));
+                    if (opportunity.getLocation().getGeoLocation() != null
+                            && !opportunityIds.contains(opportunity.getOppId())
+                            && (isSaved || categoryMatch)) {
+                        LatLng latLng = new LatLng(opportunity.getLocation().getGeoLocation().getLatitude(),
+                                opportunity.getLocation().getGeoLocation().getLongitude());
+                        while (opportunityLocations.contains(latLng)) {
+                            latLng = moveNearbyRandomly(latLng);
                         }
+                        VolunteerClusterItem offsetItem =
+                                new VolunteerClusterItem(opportunity.getOppId(), latLng.latitude, latLng.longitude, opportunity.getTitle(), opportunity.getParentOrg().getName());
+                        mClusterManager.addItem(offsetItem);
+                        opportunityIds.add(opportunity.getOppId());
+                        opportunityLocations.add(latLng);
                     }
                 }
-                Log.d(TAG, "Refreshing Cluster Manager");
                 mClusterManager.cluster();
             }
         });

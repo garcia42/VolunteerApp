@@ -9,7 +9,7 @@ android {
         applicationId "jegarcia.semicharmed.VolunteerMaps"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 7
+        versionCode 8
         versionName "1.6"
         multiDexEnabled true
     }
@@ -53,4 +53,5 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     implementation 'com.github.jd-alexander:LikeButton:0.2.3'
     implementation 'com.github.varunest:sparkbutton:1.0.5'
+    implementation 'com.ms-square:expandableTextView:0.1.4'
 }

@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
 
     private Realm realm;
-    private String TAG = MainActivity.class.getSimpleName();
+    private String TAG = MainActivity.class.getSimpleName() +"Jesus";
     private int PERMISSIONS_RESULT_CODE = 113441235;
     private int mCategoryId;
 
@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.framelayout);
 //        ButterKnife.bind(this);
-        Log.d(TAG, "MainActivity onCreate");
 
         realm = getRealm();
         RealmHelper.removeOldEvents(this); //TODO do this less frequently
@@ -75,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setCheckedItem(R.id.all_menu);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -87,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
                         // Add code here to update the UI based on the item selected
                         // For example, swap UI fragments here
                         switch(menuItem.getItemId()) {
+                            case R.id.saved_menu:
+                                mCategoryId = -1;
+                                break;
                             case R.id.all_menu:
                                 mCategoryId = 0;
                                 break;
@@ -117,9 +120,6 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.seniors_menu:
                                 mCategoryId = 12;
                                 break;
-                            case R.id.other_menu:
-                                mCategoryId = -1;
-                                break;
                         }
                         editor.apply();
                         Map mapFragment = (Map) getSupportFragmentManager().findFragmentById(R.id.map_frame);
@@ -134,21 +134,21 @@ public class MainActivity extends AppCompatActivity {
         boolean network_enabled = locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
         if (network_enabled) {
-            Log.d(TAG, "MainActivity network enabled");
+            Log.d(TAG, " MainActivity network enabled");
         }
 
         double longitude;
         double latitude;
         String city;
         if (location != null) {
-            Log.d(TAG, "MainActivity location mananger getLastKnownLocation " + location.toString());
+            Log.d(TAG, " MainActivity location mananger getLastKnownLocation " + location.toString());
             longitude = location.getLongitude();
             latitude = location.getLatitude();
             city = RealmHelper.getCityFromPosition(this, longitude, latitude);
             if (StringUtils.isEmpty(city)) {
                 city = "San Francisco";
             }
-            Log.d(TAG, "Location of user " + longitude + " " + latitude + " " + city);
+            Log.d(TAG, " Location of user " + longitude + " " + latitude + " " + city);
         } else {
             city = "Sacramento";
         }
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                     location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                     getLocation(locManager, location);
                 } catch (SecurityException e) {
-                    Log.e(TAG, "Permission For Location Not Granted");
+                    Log.e(TAG, " Permission For Location Not Granted");
                 }
             }
         }

@@ -2,24 +2,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/saved_menu"
+            android:icon="@drawable/ic_favorite_black_24dp"
+            android:title="@string/saved" />
+        <item
             android:id="@+id/all_menu"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_all_inclusive_black_24dp"
             android:title="@string/all" />
         <item
             android:id="@+id/advocacy_menu"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_gavel_black_24dp"
             android:title="@string/advocacy" />
         <item
             android:id="@+id/animals_menu"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_pets_black_24dp"
             android:title="@string/animals" />
         <item
             android:id="@+id/arts_menu"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_palette_black_24dp"
             android:title="@string/arts" />
         <item
             android:id="@+id/children_menu"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_child_care_black_24dp"
             android:title="@string/children" />
 
         <item
@@ -29,25 +33,21 @@
 
         <item
             android:id="@+id/computers_menu"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_laptop_black_24dp"
             android:title="@string/computers" />
 
         <item
             android:id="@+id/education_menu"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_school_black_24dp"
             android:title="@string/education" />
         <item
             android:id="@+id/health_menu"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_local_hospital_black_24dp"
             android:title="@string/health" />
         <item
             android:id="@+id/seniors_menu"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_accessibility_black_24dp"
             android:title="@string/seniors" />
-        <item
-            android:id="@+id/other_menu"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="@string/other" />
 
     </group>
 </menu>

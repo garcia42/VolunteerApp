@@ -157,30 +157,18 @@ public class SearchResultAdapter extends RealmRecyclerViewAdapter<Opportunities,
 
             oppViewHolder.likeButton.setEventListener(new SparkEventListener(){
                 @Override
-                public void onEvent(ImageView imageView, boolean b) {
+                public void onEvent(ImageView imageView, final boolean b) {
                     Realm realm = Realm.getDefaultInstance();
-                    if (b) {
-                        realm.executeTransactionAsync(new Realm.Transaction() {
+                    realm.executeTransactionAsync(new Realm.Transaction() {
 
-                            @Override
-                            public void execute(Realm realm) {
-                                Opportunities modifyOpp = realm.where(Opportunities.class).equalTo("id", oppId).findFirst();
-                                if (modifyOpp != null) {
-                                    modifyOpp.setLiked(true);
-                                }
+                        @Override
+                        public void execute(Realm realm) {
+                            Opportunities modifyOpp = realm.where(Opportunities.class).equalTo("id", oppId).findFirst();
+                            if (modifyOpp != null) {
+                                modifyOpp.setLiked(b);
                             }
-                        });
-                    } else {
-                        realm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                Opportunities modifyOpp = realm.where(Opportunities.class).equalTo("id", oppId).findFirst();
-                                if (modifyOpp != null) {
-                                    modifyOpp.setLiked(false);
-                                }
-                            }
-                        });
-                    }
+                        }
+                    });
                 }
 
                 @Override

@@ -45,7 +45,7 @@ public class VolunteerMatchApiService {
     private static final String PASSWORD = "0ed901afd6584a580e3aaf55484dec04";
 
     private static final String HTTP_METHOD_GET = "GET";
-    private static final String TAG = VolunteerMatchApiService.class.getName();
+    private static final String TAG = VolunteerMatchApiService.class.getName() + "Jesus";
     private static final String PREFS_NAME = "volunteerPrefsConfig";
 
     private static Gson gson;
@@ -125,10 +125,7 @@ public class VolunteerMatchApiService {
     public static void downloadAllOppsInArea(int pageNumber, int daysSince, Context context, String location) {
         SharedPreferences editor = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String key = context.getString(R.string.last_check_date) + location; //Takes into account location
-        if (!editor.contains(key)) {
-            editor.edit().putString(key, VolunteerRequestUtils.formatDateAndTime(15)).apply();
-        }
-        String updatedSince = editor.getString(String.valueOf(R.string.last_check_date), "2015-04-05T00:00:00Z");
+        String updatedSince = editor.getString(key, VolunteerRequestUtils.formatDateAndTime(15));
         String searchOppsQuery = SearchOpportunitiesExample.buildSearchOppsQuery(pageNumber, updatedSince, daysSince, location);
         try {
             VolunteerMatchApiService.WSSECredentials wsse = buildWSSECredentials(ACCOUNT_NAME, PASSWORD);

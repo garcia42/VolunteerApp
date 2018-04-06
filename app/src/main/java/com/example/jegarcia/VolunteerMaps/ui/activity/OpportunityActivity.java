@@ -25,7 +25,6 @@ import com.example.jegarcia.VolunteerMaps.VolunteerApplication;
 import com.example.jegarcia.VolunteerMaps.models.volunteerMatchModels.Opportunities;
 import com.example.jegarcia.VolunteerMaps.ui.instagram.InstagramPhotoAdapter;
 import com.example.jegarcia.VolunteerMaps.ui.instagram.InstagramResponse;
-import com.example.jegarcia.VolunteerMaps.ui.views.ExpandableTextView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
@@ -65,11 +64,11 @@ public class OpportunityActivity extends Activity {
     @BindView(R.id.timeTextView) //AKA availability
     TextView timeTextView;
 
-    @BindView(R.id.description)
-    ExpandableTextView description;
+    @BindView(R.id.expand_text_view)
+    com.ms.square.android.expandabletextview.ExpandableTextView description;
 
-    @BindView(R.id.readMoreTextView)
-    TextView readMore;
+    @BindView(R.id.expandable_text)
+    TextView descriptionInnerText;
 
     @BindView(R.id.hostTextView)
     TextView parentOrg;
@@ -92,7 +91,7 @@ public class OpportunityActivity extends Activity {
     @BindView(R.id.instagramDescription)
     TextView instagramDescription;
 
-    private static final String TAG = OpportunityActivity.class.getSimpleName();
+    private static final String TAG = OpportunityActivity.class.getSimpleName() + "Jesus";
     public static final String CLIENT_ID = "bcbeab07a3fe4cabb3c3cac0a084e896";
     public static final String CLIENT_SECRET = "8efd5ec6ecae40a080264b2865210b3c";
     public static final String CALLBACK_URL = "redirect uri here";
@@ -199,55 +198,24 @@ public class OpportunityActivity extends Activity {
                     } else {
                         description.setText(Html.fromHtml(mDescription));
                     }
-                    Linkify.addLinks(description, Linkify.ALL);
-                    description.setMovementMethod(LinkMovementMethod.getInstance());
-                    description.addEllipsizeListener(new ExpandableTextView.EllipsizeListener() {
-                        @Override
-                        public void ellipsizeStateChanged(boolean ellipsized) {
-                            if (ellipsized) {
-                                readMore.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    });
-                    readMore.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (description.isEllipsized()) {
-                                description.setMaxLines(1000);
-                                readMore.setText(R.string.less);
-                            } else {
-                                description.setMaxLines(8);
-                                readMore.setText(R.string.more);
-                            }
-                        }
-                    });
+                    Linkify.addLinks(descriptionInnerText, Linkify.ALL);
 
+                    descriptionInnerText.setMovementMethod(LinkMovementMethod.getInstance());
                     oppNameTitleBar.setText(String.valueOf(mTitle));
                     opportunityName.setText(String.valueOf(mTitle));
 
                     sparkButton.setChecked(mIsLiked);
                     sparkButton.setEventListener(new SparkEventListener() {
                         @Override
-                        public void onEvent(ImageView imageView, boolean b) {
-                            Realm realm = Realm.getDefaultInstance();
-                            if (b) {
+                        public void onEvent(ImageView imageView, final boolean b) {
+                            try (Realm realm = Realm.getDefaultInstance()) {
                                 realm.executeTransactionAsync(new Realm.Transaction() {
 
                                     @Override
                                     public void execute(Realm realm) {
                                         Opportunities modifyOpp = realm.where(Opportunities.class).equalTo("id", mOpportunityId).findFirst();
                                         if (modifyOpp != null) {
-                                            modifyOpp.setLiked(true);
-                                        }
-                                    }
-                                });
-                            } else {
-                                realm.executeTransaction(new Realm.Transaction() {
-                                    @Override
-                                    public void execute(Realm realm) {
-                                        Opportunities modifyOpp = realm.where(Opportunities.class).equalTo("id", mOpportunityId).findFirst();
-                                        if (modifyOpp != null) {
-                                            modifyOpp.setLiked(false);
+                                            modifyOpp.setLiked(b);
                                         }
                                     }
                                 });
@@ -311,7 +279,7 @@ public class OpportunityActivity extends Activity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                VolleyLog.e(TAG, "Error Calling Pinterest API: " + error.getMessage());
+                VolleyLog.e(TAG, "Error Calling Instagram API: " + error.getMessage());
             }
         });
 

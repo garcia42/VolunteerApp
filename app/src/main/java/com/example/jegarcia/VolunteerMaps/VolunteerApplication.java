@@ -2,7 +2,6 @@ package com.example.jegarcia.VolunteerMaps;
 
 import android.app.Application;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -57,7 +56,6 @@ public class VolunteerApplication extends Application {
         // set the default tag if tag is empty
         req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
         getRequestQueue().add(req);
-        Log.d(TAG, "Added REST request to queue");
     }
 
     public <T> void addToRequestQueue(Request<T> req) {

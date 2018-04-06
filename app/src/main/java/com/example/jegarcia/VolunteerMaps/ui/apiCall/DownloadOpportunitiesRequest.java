@@ -25,7 +25,7 @@ import static com.example.jegarcia.VolunteerMaps.ui.apiCall.VolunteerMatchApiSer
 
 public class DownloadOpportunitiesRequest extends JsonObjectRequest {
 
-    private static final String TAG = DownloadOpportunitiesRequest.class.getSimpleName();
+    private static final String TAG = DownloadOpportunitiesRequest.class.getSimpleName() + "Jesus";
     private static final String PREFS_NAME = "volunteerPrefsConfig";
 
     private Map<String, String> mHeaders;
@@ -60,17 +60,16 @@ public class DownloadOpportunitiesRequest extends JsonObjectRequest {
         }
         OppSearchResult result = gson.fromJson(json, OppSearchResult.class);
 
-        if (result.getCurrentPage() == result.getResultsSize() / 20) { //TODO math might be off
-            SharedPreferences.Editor editor = mContext.getSharedPreferences(PREFS_NAME, 0).edit();
-            String key = mContext.getString(R.string.last_check_date) + mLocation;
-            editor.putString(key, VolunteerRequestUtils.formatDateAndTime(0)).apply();
-        }
-
         if (!isResultOk(result)) {
             return Response.error(new VolleyError(response));
         }
         if (result.getCurrentPage() == 1 || result.getCurrentPage() == 0) {
             VolunteerMatchApiService.enqueueOtherPages(result, mContext, mLocation);
+            //Once you enqueue rest of pages or don't have to then set the timestamp
+            //If you set the timestamp before this then you'll cut the downloads short
+            SharedPreferences.Editor editor = mContext.getSharedPreferences(PREFS_NAME, 0).edit();
+            String key = mContext.getString(R.string.last_check_date) + mLocation;
+            editor.putString(key, VolunteerRequestUtils.formatDateAndTime(0)).apply();
         }
         if (isEmulator()) {
             for (Opportunities opp : result.getOpportunities()) {
@@ -101,8 +100,8 @@ public class DownloadOpportunitiesRequest extends JsonObjectRequest {
             Log.d(TAG, "No opportunities in this area?");
             return false;
         }
-        Log.d(TAG, "Finished searching for opportunities size: " + result.getOpportunities().size());
-        Log.d(TAG, "Finished searching for currentPage: " + result.getCurrentPage());
+        Log.i(TAG, "Finished searching for opportunities size: " + result.getOpportunities().size());
+        Log.i(TAG, "Finished searching for currentPage: " + result.getCurrentPage());
         return true;
     }
 
