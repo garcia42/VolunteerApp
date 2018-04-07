@@ -100,7 +100,6 @@ public class DownloadOpportunitiesRequest extends JsonObjectRequest {
             Log.d(TAG, "No opportunities in this area?");
             return false;
         }
-        Log.i(TAG, "Finished searching for opportunities size: " + result.getOpportunities().size());
         Log.i(TAG, "Finished searching for currentPage: " + result.getCurrentPage());
         return true;
     }

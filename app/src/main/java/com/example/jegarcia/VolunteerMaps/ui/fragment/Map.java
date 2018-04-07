@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -45,7 +46,9 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import org.apache.axis.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -229,46 +232,64 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
 
     @Override
     public void onStop() {
+        mapView.onStop();
         super.onStop();
     }
 
     public void loadOpportunitiesListener() {
         Log.i(TAG, "Create Realm Listener for new map events");
-        Realm realm = ((MainActivity) getActivity()).getRealm();
-//        opportunities = realm.where(Opportunities.class).findAllAsync();
+        final Realm realm = ((MainActivity) getActivity()).getRealm();
         mClusterManager.clearItems();
         opportunities = null;
         opportunityIds.clear();
-        if (mCategoryId > -1) {
+        opportunityLocations.clear();
+        if (mCategoryId > -1) { // Have a category to search for
             opportunities = realm.where(Opportunities.class).contains("categoryIds", "," + mCategoryId + ",").findAllAsync();
-        } else {
+        } else { //Only show saved opportunities
             opportunities = realm.where(Opportunities.class).equalTo("isLiked", true).findAllAsync();
         }
         opportunities.addChangeListener(new RealmChangeListener<RealmResults<Opportunities>>() {
             @Override
-            public void onChange(@NonNull RealmResults<Opportunities> opportunities) {
+            public void onChange(@NonNull final RealmResults<Opportunities> opportunities) {
                 Log.i(TAG, "In Change Listener for Map Markers: isLoaded: " + opportunities.isLoaded() + " Size: " + opportunities.size());
-                for (Opportunities opportunity: opportunities) {
-                    boolean isSaved = opportunity.isLiked() && mCategoryId == -1;
-                    boolean categoryMatch = opportunity.getCategoryIds().contains(String.valueOf(mCategoryId));
-                    if (opportunity.getLocation().getGeoLocation() != null
-                            && !opportunityIds.contains(opportunity.getOppId())
-                            && (isSaved || categoryMatch)) {
-                        LatLng latLng = new LatLng(opportunity.getLocation().getGeoLocation().getLatitude(),
-                                opportunity.getLocation().getGeoLocation().getLongitude());
-                        while (opportunityLocations.contains(latLng)) {
-                            latLng = moveNearbyRandomly(latLng);
-                        }
-                        VolunteerClusterItem offsetItem =
-                                new VolunteerClusterItem(opportunity.getOppId(), latLng.latitude, latLng.longitude, opportunity.getTitle(), opportunity.getParentOrg().getName());
-                        mClusterManager.addItem(offsetItem);
-                        opportunityIds.add(opportunity.getOppId());
-                        opportunityLocations.add(latLng);
-                    }
-                }
-                mClusterManager.cluster();
+                new ProcessMarkersTask().execute(realm.copyFromRealm(opportunities));
             }
         });
+    }
+
+    class ProcessMarkersTask extends AsyncTask<List<Opportunities>, Void, List<VolunteerClusterItem>> {
+
+        @Override
+        protected final List<VolunteerClusterItem> doInBackground(List<Opportunities>... args) {
+            List<Opportunities> opportunities = args[0];
+            List<VolunteerClusterItem> clusterItems = new ArrayList<>();
+            for (Opportunities opportunity: opportunities) {
+                boolean isSaved = opportunity.isLiked() && mCategoryId == -1;
+                boolean categoryMatch = opportunity.getCategoryIds().contains(String.valueOf(mCategoryId));
+                if (opportunity.getLocation().getGeoLocation() != null
+                        && !opportunityIds.contains(opportunity.getOppId())
+                        && (isSaved || categoryMatch)) {
+                    LatLng latLng = new LatLng(opportunity.getLocation().getGeoLocation().getLatitude(),
+                            opportunity.getLocation().getGeoLocation().getLongitude());
+                    while (opportunityLocations.contains(latLng)) {
+                        latLng = moveNearbyRandomly(latLng);
+                    }
+                    opportunityLocations.add(latLng);
+                    opportunityIds.add(opportunity.getOppId());
+                    VolunteerClusterItem offsetItem =
+                            new VolunteerClusterItem(opportunity.getOppId(), latLng.latitude, latLng.longitude, opportunity.getTitle(), opportunity.getParentOrg().getName());
+                    clusterItems.add(offsetItem);
+                }
+            }
+            return clusterItems;
+        }
+
+        @Override
+        protected void onPostExecute(List<VolunteerClusterItem> clusterItems) {
+            super.onPostExecute(clusterItems);
+            mClusterManager.addItems(clusterItems);
+            Map.this.mClusterManager.cluster();
+        }
     }
 
     private LatLng moveNearbyRandomly(LatLng latLng) {
@@ -377,7 +398,6 @@ public class Map extends Fragment implements OnMapReadyCallback, GoogleApiClient
                                         Context context = Map.this.getActivity();
                                         if (context != null) {
                                             context.startService(prepareIntent(city));
-                                            //VolunteerMatchApiService.downloadAllOppsInArea(0, daysSince, getContext(), city);
                                         } else {
                                             Log.e(TAG, "Failed to start search service in Map");
                                         }

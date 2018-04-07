@@ -54,4 +54,5 @@ dependencies {
     implementation 'com.github.jd-alexander:LikeButton:0.2.3'
     implementation 'com.github.varunest:sparkbutton:1.0.5'
     implementation 'com.ms-square:expandableTextView:0.1.4'
+    implementation 'com.tuyenmonkey:mkloader:1.4.0'
 }

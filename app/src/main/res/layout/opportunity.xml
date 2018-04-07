@@ -92,6 +92,7 @@
                 android:layout_height="180dp">
 
                 <ImageView
+                    android:visibility="gone"
                     android:layout_centerInParent="true"
                     android:src="@drawable/rsz_volunteer"
                     android:layout_width="wrap_content"
@@ -99,6 +100,14 @@
                     android:minHeight="160dp"
                     android:minWidth="160dp"
                     android:id="@+id/imageView"/>
+
+                <com.tuyenmonkey.mkloader.MKLoader
+                    android:id="@+id/loadingLayout"
+                    android:layout_centerInParent="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:mk_type="Sharingan"
+                    />
             </RelativeLayout>
 
             <TextView
@@ -220,6 +229,7 @@
                 android:textColor="@color/black"/>
 
             <com.ms.square.android.expandabletextview.ExpandableTextView
+                android:padding="8dp"
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:expandableTextView="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/expand_text_view"
@@ -250,6 +260,7 @@
                 android:paddingLeft="8dp"
                 android:paddingStart="8dp"
                 android:paddingBottom="8dp"
+                android:paddingTop="8dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"

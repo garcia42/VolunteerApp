@@ -28,6 +28,7 @@ import com.example.jegarcia.VolunteerMaps.ui.instagram.InstagramResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
+import com.tuyenmonkey.mkloader.MKLoader;
 import com.varunest.sparkbutton.SparkButton;
 import com.varunest.sparkbutton.SparkEventListener;
 
@@ -91,6 +92,9 @@ public class OpportunityActivity extends Activity {
     @BindView(R.id.instagramDescription)
     TextView instagramDescription;
 
+    @BindView(R.id.loadingLayout)
+    MKLoader loader;
+
     private static final String TAG = OpportunityActivity.class.getSimpleName() + "Jesus";
     public static final String CLIENT_ID = "bcbeab07a3fe4cabb3c3cac0a084e896";
     public static final String CLIENT_SECRET = "8efd5ec6ecae40a080264b2865210b3c";
@@ -149,6 +153,10 @@ public class OpportunityActivity extends Activity {
             }, new Realm.Transaction.OnSuccess() {
                 @Override
                 public void onSuccess() {
+
+                    loader.setVisibility(GONE);
+                    imageView.setVisibility(View.VISIBLE);
+
                     if (!StringUtils.isEmpty(mImageUrl)) {
                         String decodedUrl = URLDecoder.decode(mImageUrl);
                         Picasso.with(getBaseContext()).load(decodedUrl).into(imageView);
